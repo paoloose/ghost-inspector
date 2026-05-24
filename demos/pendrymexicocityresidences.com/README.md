@@ -2,6 +2,8 @@
 
 This directory contains a static HTML/CSS/JS clone of the original business website at `https://pendrymexicocityresidences.com/`.
 
+Our mocked version is <https://pendrymexicocityresidences.paoloose.site/>. Use it as URL.
+
 ---
 
 ## Business Name

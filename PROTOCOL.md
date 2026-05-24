@@ -7,16 +7,25 @@ The Ghost Shopper backend is an async orchestration layer built on **Starlette**
 - **MJPEG stream** of the live browser (CDP screencast)
 - **WebSocket events** stream (agent thoughts, actions, progress)
 - **HTTP API** to launch jobs and query status
+- **Static SPA serving** — the built React admin dashboard is served from `/`
 
-All endpoints are CORS-enabled (`*` origins).
+All endpoints share the same origin. CORS is enabled (`*` origins) for flexibility during transition.
 
 ---
 
 ## Base URL
 
+Production (deployed):
+```
+https://ghostinspector.paoloose.site
+```
+
+Local development:
 ```
 http://localhost:8001
 ```
+
+In development the frontend runs on Vite (`localhost:5173`) with a proxy that forwards `/api`, `/mjpeg`, and `/ws` to `localhost:8001`.
 
 ---
 
@@ -50,11 +59,13 @@ The backend builds the final agent prompt from `TASK_TEMPLATES[task_type]` with 
 {
   "job_id": "550e8400e29b41d4a716446655440000",
   "status": "running",
-  "mjpeg_url": "http://localhost:8001/mjpeg/v1/watch/550e8400e29b41d4a716446655440000",
-  "events_ws_url": "ws://localhost:8001/ws/v1/events/550e8400e29b41d4a716446655440000",
+  "mjpeg_url": "/mjpeg/v1/watch/550e8400e29b41d4a716446655440000",
+  "events_ws_url": "/ws/v1/events/550e8400e29b41d4a716446655440000",
   "created_at": "2025-05-23T18:30:00Z"
 }
 ```
+
+> Note: `mjpeg_url` and `events_ws_url` are returned as relative paths. The frontend constructs the full WebSocket URL from `window.location` (`wss://` when on HTTPS, `ws://` when on HTTP).
 
 **Rate limit 429:**
 ```json
@@ -78,7 +89,7 @@ The backend builds the final agent prompt from `TASK_TEMPLATES[task_type]` with 
 
 **Usage in HTML:**
 ```html
-<img src="http://localhost:8001/mjpeg/v1/watch/{job_id}" />
+<img src="/mjpeg/v1/watch/{job_id}" />
 ```
 
 > Note: Some browsers buffer MJPEG; for lowest latency use a dedicated viewer or the WebSocket events alongside.
