@@ -4,7 +4,7 @@ from pathlib import Path
 import os
 
 # Rate limiting
-RATE_LIMIT_SECONDS = 20
+RATE_LIMIT_SECONDS = 10
 
 # Server
 API_HOST = "0.0.0.0"
