@@ -19,15 +19,7 @@ export default function Sidebar({ active, onNavigate }) {
         </div>
       </div>
 
-      <div className="px-4 mb-4">
-        <div className="flex items-center gap-2 px-3 py-2 rounded-md bg-bg-elev border border-line cursor-pointer hover:border-line-strong transition-colors">
-          <span className="w-5 h-5 rounded bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-[10px] font-bold">MX</span>
-          <span className="text-[13px] font-medium text-ink flex-1 truncate">México Inmobiliario</span>
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-ink-3"><path d="M6 9l6 6 6-6"/></svg>
-        </div>
-      </div>
-
-      <nav className="flex-1 px-3">
+      <nav className="flex-1 px-3 pt-2">
         <p className="px-3 mb-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-ink-3">Overview</p>
         {NAV_ITEMS.map((item) => (
           <button

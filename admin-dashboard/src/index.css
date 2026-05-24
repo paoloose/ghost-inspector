@@ -18,7 +18,10 @@
   }
 
   #root {
-    zoom: 1.15;
+    transform: scale(1.15);
+    transform-origin: top left;
+    width: calc(100% / 1.15);
+    min-height: calc(100vh / 1.15);
   }
 
   ::-webkit-scrollbar {
