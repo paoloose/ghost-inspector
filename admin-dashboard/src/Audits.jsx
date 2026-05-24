@@ -2,6 +2,37 @@ import { useState, useEffect, useRef } from 'react'
 import { Card, CardHead, Btn } from './ui'
 import { businesses } from './data'
 
+function ActionBadge({ action }) {
+  const colors = {
+    navigate: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
+    click: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
+    type: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
+    scroll: 'bg-purple-500/10 text-purple-400 border-purple-500/20',
+    screenshot: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20',
+  }
+  const normalized = (action || 'unknown').toLowerCase().replace(/\s+/g, '_')
+  const matched = Object.keys(colors).find(k => normalized.includes(k))
+  const colorClass = matched ? colors[matched] : 'bg-ink-3/10 text-ink-3 border-ink-3/20'
+  return (
+    <span className={`text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded border ${colorClass}`}>
+      {action || 'unknown'}
+    </span>
+  )
+}
+
+function HeartbeatGroup({ events, startIndex }) {
+  // Count consecutive heartbeats from startIndex backward
+  let count = 0
+  for (let i = startIndex; i >= 0; i--) {
+    if (events[i].type === 'heartbeat') count++
+    else break
+  }
+  if (count > 1) {
+    return <span className="text-ink-3 opacity-30 text-[10px]">· heartbeat ×{count}</span>
+  }
+  return <span className="text-ink-3 opacity-30 text-[10px]">· heartbeat</span>
+}
+
 const TASK_TYPES = [
   {
     key: 'whatsapp',
@@ -186,12 +217,12 @@ FINAL REPORT STRUCTURE:
 
 function StepIndicator({ current, total, onStepClick }) {
   return (
-    <div className="flex items-center gap-2 mb-8">
+    <div id="step-indicator" className="flex items-center gap-6 mb-8">
       {Array.from({ length: total }).map((_, i) => (
         <div key={i} className="flex items-center gap-2">
           <button
             onClick={() => onStepClick(i + 1)}
-            className={`w-8 h-8 rounded-full flex items-center justify-center text-[13px] font-bold transition-all ${
+            className={`w-8 h-8 rounded-full flex items-center justify-center text-[14px] font-bold transition-all ${
               i + 1 === current
                 ? 'bg-brand text-white shadow-glow'
                 : i + 1 < current
@@ -214,35 +245,35 @@ function SelectBusinessStep({ selected, onSelect }) {
   return (
     <div className="animate-fade-in">
       <h2 className="text-[18px] font-bold text-ink mb-1">Seleccionar Negocio</h2>
-      <p className="text-[13px] text-ink-3 mb-6">Elige la inmobiliaria que quieres auditar</p>
+      <p className="text-[14px] text-ink-3 mb-6">Elige la inmobiliaria que quieres auditar</p>
       <div className="grid grid-cols-2 gap-4">
         {businesses.map(biz => (
           <button
             key={biz.id}
             onClick={() => onSelect(biz)}
-            className={`flex items-start gap-4 p-5 rounded-xl border text-left transition-all ${
+            className={`flex items-start gap-6 p-5 rounded-xl border text-left transition-all ${
               selected?.id === biz.id
                 ? 'border-brand bg-brand/5 shadow-glow'
                 : 'border-line bg-bg-elev hover:border-line-strong hover:bg-bg-card'
             }`}
           >
-            <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-brand/30 to-brand/10 border border-brand/20 flex items-center justify-center text-brand-light font-bold text-[13px] shrink-0">
+            <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-brand/30 to-brand/10 border border-brand/20 flex items-center justify-center text-brand-light font-bold text-[14px] shrink-0">
               {biz.name.split(' ').map(w => w[0]).join('').slice(0, 2)}
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-[14px] font-semibold text-ink truncate">{biz.name}</p>
-              <p className="text-[12px] text-ink-3 mt-1">{biz.location.city} · {biz.website}</p>
-              <div className="flex items-center gap-2 mt-2">
+              <p className="text-[14px] text-ink-3 mt-1">{biz.location.city} · {biz.website}</p>
+              <div className="flex items-center gap-6 mt-2">
                 {biz.score !== null && (
-                  <span className={`text-[11px] font-bold tabular-nums px-1.5 py-0.5 rounded ${biz.score >= 7 ? 'bg-emerald-500/10 text-emerald-400' : biz.score >= 5 ? 'bg-amber-500/10 text-amber-400' : 'bg-red-500/10 text-red-400'}`}>
+                  <span className={`text-[14px] font-bold tabular-nums px-1.5 py-0.5 rounded ${biz.score >= 7 ? 'bg-emerald-500/10 text-emerald-400' : biz.score >= 5 ? 'bg-amber-500/10 text-amber-400' : 'bg-red-500/10 text-red-400'}`}>
                     {biz.score.toFixed(1)}
                   </span>
                 )}
-                <span className="text-[11px] text-ink-3">{biz.crawlData.pagesFound} páginas</span>
+                <span className="text-[14px] text-ink-3">{biz.crawlData.pagesFound} páginas</span>
               </div>
             </div>
             {selected?.id === biz.id && (
-              <div className="w-6 h-6 rounded-full bg-brand flex items-center justify-center text-white text-[12px] shrink-0 mt-1">✓</div>
+              <div className="w-6 h-6 rounded-full bg-brand flex items-center justify-center text-white text-[14px] shrink-0 mt-1">✓</div>
             )}
           </button>
         ))}
@@ -260,21 +291,21 @@ function PromptEditorModal({ taskType, onClose }) {
       <div className="relative w-full max-w-[720px] max-h-[85vh] bg-bg-card border border-line rounded-2xl shadow-glow flex flex-col">
         <div className="flex items-center justify-between px-6 py-4 border-b border-line">
           <div>
-            <h3 className="text-[15px] font-bold text-ink">Editar prompt: {taskLabel}</h3>
-            <p className="text-[12px] text-ink-3 mt-0.5">Vista previa del prompt que recibe el agente. Esto es solo visual — el backend usa su propia plantilla.</p>
+            <h3 className="text-[14px] font-bold text-ink">Editar prompt: {taskLabel}</h3>
+            <p className="text-[14px] text-ink-3 mt-0.5">Vista previa del prompt que recibe el agente. Esto es solo visual — el backend usa su propia plantilla.</p>
           </div>
-          <button onClick={onClose} className="w-8 h-8 rounded-lg bg-bg-elev border border-line flex items-center justify-center text-ink-3 hover:text-ink transition-colors text-[16px]">×</button>
+          <button onClick={onClose} className="w-8 h-8 rounded-lg bg-bg-elev border border-line flex items-center justify-center text-ink-3 hover:text-ink transition-colors text-[18px]">×</button>
         </div>
         <div className="flex-1 overflow-y-auto p-6">
           <textarea
             readOnly
             value={prompt}
             rows={24}
-            className="w-full px-4 py-3 bg-bg-elev border border-line rounded-lg text-[12px] text-ink-2 font-mono leading-relaxed resize-none focus:outline-none"
+            className="w-full px-6 py-5 bg-bg-elev border border-line rounded-lg text-[14px] text-ink-2 font-mono leading-relaxed resize-none focus:outline-none"
           />
         </div>
         <div className="px-6 py-4 border-t border-line flex items-center justify-between">
-          <p className="text-[11px] text-ink-3">Los cambios aquí no afectan el backend. El servidor usa TASK_TEMPLATES hardcodeadas.</p>
+          <p className="text-[14px] text-ink-3">Los cambios aquí no afectan el backend. El servidor usa TASK_TEMPLATES hardcodeadas.</p>
           <Btn variant="secondary" size="sm" onClick={onClose}>Cerrar</Btn>
         </div>
       </div>
@@ -286,13 +317,13 @@ function ConfigureStep({ selectedBiz, params, onChange, onEditPrompt }) {
   return (
     <div className="animate-fade-in">
       <h2 className="text-[18px] font-bold text-ink mb-1">Configurar Ghost Shopper</h2>
-      <p className="text-[13px] text-ink-3 mb-6">Ajusta los parámetros del bot de auditoría</p>
+      <p className="text-[14px] text-ink-3 mb-6">Ajusta los parámetros del bot de auditoría</p>
 
-      <div className="space-y-5">
+      <div className="space-y-6">
         {/* Task Type */}
         <div>
           <label className="block text-[12px] font-semibold uppercase tracking-[0.1em] text-ink-3 mb-3">Tipo de auditoría</label>
-          <div className="grid grid-cols-2 gap-3">
+          <div id="task-type-grid" className="grid grid-cols-2 gap-3">
             {TASK_TYPES.map(t => (
               <button
                 key={t.key}
@@ -305,16 +336,17 @@ function ConfigureStep({ selectedBiz, params, onChange, onEditPrompt }) {
               >
                 <div className="flex items-center gap-2 mb-2">
                   <span className="text-[18px]">{t.icon}</span>
-                  <span className="text-[14px] font-semibold text-ink">{t.label}</span>
+                  <span className="text-[15px] font-semibold text-ink">{t.label}</span>
                   {params.taskType === t.key && (
-                    <span className="ml-auto text-[10px] font-semibold text-brand bg-brand/10 px-1.5 py-0.5 rounded">Por defecto</span>
+                    <span className="ml-auto text-[14px] font-semibold text-brand bg-brand/10 px-1.5 py-0.5 rounded">Por defecto</span>
                   )}
                 </div>
-                <p className="text-[12px] text-ink-3 leading-relaxed">{t.desc}</p>
+                <p className="text-[13px] text-ink-3 leading-relaxed">{t.desc}</p>
                 <div className="mt-3 pt-3 border-t border-line/50">
-                  <button
+                    <button
+                    id="edit-prompt-btn"
                     onClick={(e) => { e.stopPropagation(); onEditPrompt(t.key); }}
-                    className="text-[11px] font-semibold text-brand-light hover:text-brand transition-colors flex items-center gap-1"
+                    className="text-[14px] font-semibold text-brand-light hover:text-brand transition-colors flex items-center gap-1"
                   >
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                     Editar prompt
@@ -332,7 +364,7 @@ function ConfigureStep({ selectedBiz, params, onChange, onEditPrompt }) {
             type="text"
             value={params.url}
             onChange={e => onChange({ ...params, url: e.target.value })}
-            className="w-full h-11 px-4 bg-bg-elev border border-line rounded-lg text-[13px] text-ink focus:outline-none focus:border-brand/50 transition-colors"
+            className="w-full h-11 px-4 bg-bg-elev border border-line Mpx] text-ink focus:outline-none focus:border-brand/50 transition-colors"
           />
         </div>
 
@@ -345,10 +377,10 @@ function ConfigureStep({ selectedBiz, params, onChange, onEditPrompt }) {
             value={params.context}
             onChange={e => onChange({ ...params, context: e.target.value })}
             rows={8}
-            className="w-full px-4 py-3 bg-bg-elev border border-line rounded-lg text-[13px] text-ink focus:outline-none focus:border-brand/50 transition-colors resize-none font-mono leading-relaxed"
+            className="w-full px-6 py-5 bg-bg-elev border border-line Mpx] text-ink focus:outline-none focus:border-brand/50 transition-colors resize-none font-mono leading-relaxed"
             placeholder="Pega aquí la información scrapeada del negocio..."
           />
-          <p className="text-[11px] text-ink-3 mt-1.5">Este contexto se inyecta en el prompt del agente para que tome decisiones informadas.</p>
+          <p className="text-[14px] text-ink-3 mt-1.5">Este contexto se inyecta en el prompt del agente para que tome decisiones informadas.</p>
         </div>
 
         {/* Viewport */}
@@ -367,8 +399,8 @@ function ConfigureStep({ selectedBiz, params, onChange, onEditPrompt }) {
                   : 'border-line bg-bg-elev hover:border-line-strong'
               }`}
             >
-              <p className="text-[13px] font-semibold text-ink">{v.label}</p>
-              <p className="text-[11px] text-ink-3 mt-0.5">{v.dim}</p>
+              <p className="text-[14px] font-semibold text-ink">{v.label}</p>
+              <p className="text-[14px] text-ink-3 mt-0.5">{v.dim}</p>
             </button>
           ))}
         </div>
@@ -387,28 +419,28 @@ function ReviewStep({ business, params, onRun, job, onReset }) {
   return (
     <div className="animate-fade-in">
       <h2 className="text-[18px] font-bold text-ink mb-1">Revisar y Lanzar</h2>
-      <p className="text-[13px] text-ink-3 mb-6">Verifica los parámetros antes de iniciar la auditoría</p>
+      <p className="text-[14px] text-ink-3 mb-6">Verifica los parámetros antes de iniciar la auditoría</p>
 
-      <div className="grid grid-cols-2 gap-4 mb-5">
+      <div className="grid grid-cols-2 gap-6 mb-5">
         <Card padding="p-5">
           <CardHead title="Negocio" />
           <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-brand/30 to-brand/10 border border-brand/20 flex items-center justify-center text-brand-light font-bold text-[13px]">
+            <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-brand/30 to-brand/10 border border-brand/20 flex items-center justify-center text-brand-light font-bold text-[14px]">
               {business.name.split(' ').map(w => w[0]).join('').slice(0, 2)}
             </div>
             <div>
               <p className="text-[14px] font-semibold text-ink">{business.name}</p>
-              <p className="text-[12px] text-ink-3">{business.website}</p>
+              <p className="text-[14px] text-ink-3">{business.website}</p>
             </div>
           </div>
         </Card>
         <Card padding="p-5">
           <CardHead title="Auditoría" />
           <div className="flex items-center gap-2">
-            <span className="text-[18px]">{TASK_TYPES.find(t => t.key === params.taskType)?.icon}</span>
+            <span className="text-[14px]">{TASK_TYPES.find(t => t.key === params.taskType)?.icon}</span>
             <div>
               <p className="text-[14px] font-semibold text-ink">{taskLabel}</p>
-              <p className="text-[12px] text-ink-3">{params.viewport} · Headless</p>
+              <p className="text-[14px] text-ink-3">{params.viewport} · Headless</p>
             </div>
           </div>
         </Card>
@@ -417,11 +449,11 @@ function ReviewStep({ business, params, onRun, job, onReset }) {
       <Card className="mb-5" padding="p-5">
         <CardHead title="Contexto del agente" />
         <div className="bg-bg-elev rounded-lg p-4 border border-line max-h-48 overflow-y-auto">
-          <pre className="text-[12px] text-ink-2 font-mono leading-relaxed whitespace-pre-wrap">{params.context}</pre>
+          <pre className="text-[14px] text-ink-2 font-mono leading-relaxed whitespace-pre-wrap">{params.context}</pre>
         </div>
       </Card>
 
-      <Btn variant="accent" size="lg" className="w-full py-4 text-[16px] shadow-glow hover:shadow-[0_0_30px_rgba(91,61,245,.25)] transition-shadow" onClick={onRun}>
+      <Btn id="launch-btn" variant="accent" size="lg" className="w-full py-4 text-[14px] shadow-glow hover:shadow-[0_0_30px_rgba(91,61,245,.25)] transition-shadow" onClick={onRun}>
         <span className="mr-2 text-[20px]">👻</span> Iniciar auditoría fantasma
       </Btn>
     </div>
@@ -470,9 +502,9 @@ function RunningView({ job, onReset }) {
           <h2 className="text-[18px] font-bold text-ink">Auditoría en progreso</h2>
           <div className="flex items-center gap-2 mt-1">
             <span className={`w-2 h-2 rounded-full ${connected ? 'bg-emerald-400 animate-pulse' : 'bg-red-400'}`} />
-            <span className="text-[12px] text-ink-3">{connected ? 'Conectado al stream en vivo' : 'Desconectado'}</span>
+            <span className="text-[13px] text-ink-3">{connected ? 'Conectado al stream en vivo' : 'Desconectado'}</span>
             <span className="text-line">|</span>
-            <span className="text-[12px] text-ink-3">{stepCount} pasos</span>
+            <span className="text-[13px] text-ink-3">{stepCount} pasos</span>
           </div>
         </div>
         {(isDone || isError) && (
@@ -483,16 +515,16 @@ function RunningView({ job, onReset }) {
       <div className="grid grid-cols-5 gap-5">
         {/* MJPEG Stream */}
         <div className="col-span-3">
-          <Card className="overflow-hidden" padding="p-0">
+          <Card id="live-stream" className="overflow-hidden" padding="p-0">
             <div className="bg-bg-elev px-4 py-2.5 border-b border-line flex items-center justify-between">
-              <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-ink-3">Live Browser Stream</span>
-              <span className="text-[10px] text-ink-3 font-mono">MJPEG</span>
+              <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-ink-3">Live Browser Stream</span>
+              <span className="text-[11px] text-ink-3 font-mono">MJPEG</span>
             </div>
             <div className="relative aspect-video bg-black flex items-center justify-center">
               {jobId ? (
                 <img src={`/mjpeg/v1/watch/${jobId}`} alt="Live browser" className="w-full h-full object-contain" onError={e => { e.target.style.display = 'none' }} />
               ) : (
-                <p className="text-[13px] text-ink-3">Esperando stream...</p>
+                <p className="text-[14px] text-ink-3">Esperando stream...</p>
               )}
             </div>
           </Card>
@@ -502,35 +534,101 @@ function RunningView({ job, onReset }) {
         <div className="col-span-2">
           <Card className="h-full flex flex-col" padding="p-0">
             <div className="bg-bg-elev px-4 py-2.5 border-b border-line flex items-center justify-between">
-              <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-ink-3">Agent Event Log</span>
-              <span className="text-[10px] text-ink-3 font-mono">{events.length} events</span>
+              <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-ink-3">Agent Event Log</span>
+              <span className="text-[11px] text-ink-3 font-mono">{events.length} events</span>
             </div>
-            <div ref={logRef} className="flex-1 overflow-y-auto p-3 space-y-2 font-mono text-[11px]" style={{ maxHeight: 400 }}>
+            <div ref={logRef} className="flex-1 overflow-y-auto p-3 space-y-2 font-mono text-[12px]" style={{ maxHeight: 400 }}>
               {events.length === 0 && <p className="text-ink-3 italic py-4 text-center">Esperando eventos del agente...</p>}
-              {events.map((e, i) => (
-                <div key={i} className="border-l-2 pl-2.5 py-1">
-                  {e.type === 'step' && (
-                    <>
-                      <span className="text-brand-light font-semibold">Step {e.step_number}</span>
-                      <span className="text-ink-3 ml-2">{e.action}</span>
-                      {e.thought && <p className="text-ink-2 mt-0.5 opacity-60 truncate">{e.thought}</p>}
-                    </>
-                  )}
-                  {e.type === 'done' && (
-                    <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-md p-2.5">
-                      <span className="text-emerald-400 font-bold">✓ Completado</span>
-                      <p className="text-ink-2 mt-1 text-[12px]">{e.result || 'Auditoría finalizada exitosamente'}</p>
+              {events.map((e, i) => {
+                // Collapse consecutive heartbeats into one — skip all but the last in a run
+                if (e.type === 'heartbeat') {
+                  const nextIsHeartbeat = events[i + 1]?.type === 'heartbeat'
+                  if (nextIsHeartbeat) return null
+                  let count = 1
+                  for (let j = i - 1; j >= 0; j--) {
+                    if (events[j].type === 'heartbeat') count++
+                    else break
+                  }
+                  return (
+                    <div key={i} className="border-l-2 pl-2.5 py-1">
+                      <span className="text-ink-3 opacity-30 text-[10px]">· heartbeat {count > 1 ? `×${count}` : ''}</span>
                     </div>
-                  )}
-                  {e.type === 'error' && (
-                    <div className="bg-red-500/10 border border-red-500/20 rounded-md p-2.5">
-                      <span className="text-red-400 font-bold">✗ Error</span>
-                      <p className="text-ink-2 mt-1 text-[12px]">{e.reason}</p>
-                    </div>
-                  )}
-                  {e.type === 'heartbeat' && <span className="text-ink-3 opacity-40">· heartbeat</span>}
-                </div>
-              ))}
+                  )
+                }
+                return (
+                  <div key={i} className="border-l-2 pl-2.5 py-1">
+                    {e.type === 'step' && (
+                      <>
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-brand-light font-semibold">Step {e.step_number}</span>
+                          <ActionBadge action={e.action} />
+                          {e.url && (
+                            <a href={e.url} target="_blank" rel="noopener noreferrer" className="text-[10px] text-ink-3 hover:text-brand-light truncate max-w-[140px]" title={e.url}>
+                              {(() => { try { return new URL(e.url).pathname } catch { return e.url } })()}
+                            </a>
+                          )}
+                        </div>
+                        {e.thought && (
+                          <div className="bg-bg-elev rounded px-2 py-1.5 border border-line/50 mt-1">
+                            <p className="text-ink-2 leading-relaxed whitespace-pre-wrap">{e.thought}</p>
+                          </div>
+                        )}
+                        {e.action_details && Object.keys(e.action_details).length > 0 && (
+                          <details className="mt-1">
+                            <summary className="text-[10px] text-ink-3 cursor-pointer hover:text-ink-2 select-none">Detalles de la acción</summary>
+                            <pre className="mt-1 text-[10px] text-ink-3 bg-bg-elev rounded p-2 border border-line/50 overflow-x-auto">
+                              {JSON.stringify(e.action_details, null, 2)}
+                            </pre>
+                          </details>
+                        )}
+                      </>
+                    )}
+                    {e.type === 'tool_call' && (
+                      <div className="bg-brand/10 border border-brand/20 rounded-md p-2.5">
+                        <span className="text-brand-light font-bold">
+                          {e.tool === 'extract_phone' && '📞 Teléfono extraído'}
+                          {e.tool === 'extract_whatsapp' && '💬 WhatsApp extraído'}
+                          {e.tool === 'extract_email' && '✉️ Email extraído'}
+                          {!['extract_phone', 'extract_whatsapp', 'extract_email'].includes(e.tool) && `🔧 ${e.tool}`}
+                        </span>
+                        <p className="text-ink-2 mt-1 text-[12px] font-mono">
+                          {e.data?.number || e.data?.email || JSON.stringify(e.data)}
+                        </p>
+                      </div>
+                    )}
+                    {e.type === 'done' && (
+                      <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-md p-2.5">
+                        <span className="text-emerald-400 font-bold">✓ Completado</span>
+                        <p className="text-ink-2 mt-1 text-[13px]">{e.result || 'Auditoría finalizada exitosamente'}</p>
+                      </div>
+                    )}
+                    {e.type === 'error' && (
+                      <div className="bg-red-500/10 border border-red-500/20 rounded-md p-2.5">
+                        <span className="text-red-400 font-bold">✗ Error</span>
+                        <p className="text-ink-2 mt-1 text-[13px]">{e.reason}</p>
+                      </div>
+                    )}
+                    {e.type === 'thinking' && (
+                      <div className="bg-purple-500/5 border border-purple-500/10 rounded-md p-2.5">
+                        <span className="text-purple-400 font-semibold text-[10px] uppercase tracking-wider">🧠 Pensando</span>
+                        <p className="text-ink-2 mt-1 text-[12px] leading-relaxed whitespace-pre-wrap">{e.thought}</p>
+                      </div>
+                    )}
+                    {e.type === 'url_change' && (
+                      <div className="flex items-center gap-2 text-[11px]">
+                        <span className="text-blue-400">🔗 URL</span>
+                        <span className="text-ink-3 truncate">{e.url}</span>
+                      </div>
+                    )}
+                    {e.type === 'status' && (
+                      <div className="flex items-center gap-2 text-[11px] text-ink-3">
+                        <span className="text-amber-400">📡</span>
+                        <span>{e.message}</span>
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
             </div>
           </Card>
         </div>
@@ -539,8 +637,8 @@ function RunningView({ job, onReset }) {
       {/* Progress */}
       <div className="mt-5">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-[12px] text-ink-3">Progreso</span>
-          <span className="text-[12px] font-semibold text-ink">{stepCount} pasos ejecutados</span>
+          <span className="text-[13px] text-ink-3">Progreso</span>
+          <span className="text-[13px] font-semibold text-ink">{stepCount} pasos ejecutados</span>
         </div>
         <div className="w-full h-2 bg-bg-elev rounded-full overflow-hidden">
           <div
@@ -610,14 +708,14 @@ export default function Audits({ preselectedBusiness, onNavigate }) {
   }
 
   return (
-    <div className="px-8 py-8 max-w-[960px] mx-auto">
+    <div className="px-9 py-9 max-w-[960px] mx-auto">
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-[22px] font-bold tracking-[-0.02em] text-gradient">Audits</h1>
-          <p className="text-[13px] text-ink-3 mt-0.5">Ghost Shopper — Auditorías automáticas con IA</p>
+          <p className="text-[14px] text-ink-3 mt-0.5">Ghost Shopper — Auditorías automáticas con IA</p>
         </div>
         {step > 1 && !job && (
-          <button onClick={() => setStep(step - 1)} className="text-[13px] text-ink-3 hover:text-ink transition-colors">
+          <button onClick={() => setStep(step - 1)} className="text-[14px] text-ink-3 hover:text-ink transition-colors">
             ← Paso anterior
           </button>
         )}
@@ -626,10 +724,10 @@ export default function Audits({ preselectedBusiness, onNavigate }) {
       {!job && <StepIndicator current={step} total={3} onStepClick={goToStep} />}
 
       {error && (
-        <div className="mb-5 bg-red-500/10 border border-red-500/20 rounded-xl p-4">
-          <p className="text-[13px] text-red-400 font-semibold">Error al iniciar auditoría</p>
-          <p className="text-[12px] text-ink-2 mt-1">{error}</p>
-          <p className="text-[11px] text-ink-3 mt-2">Asegúrate de que el backend esté corriendo</p>
+        <div className="mb-7 bg-red-500/10 border border-red-500/20 rounded-xl p-4">
+          <p className="text-[14px] text-red-400 font-semibold">Error al iniciar auditoría</p>
+          <p className="text-[14px] text-ink-2 mt-1">{error}</p>
+          <p className="text-[14px] text-ink-3 mt-2">Asegúrate de que el backend esté corriendo</p>
         </div>
       )}
 
@@ -673,8 +771,8 @@ export default function Audits({ preselectedBusiness, onNavigate }) {
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-bg-card border border-line rounded-xl p-8 text-center shadow-glow">
             <div className="w-12 h-12 border-3 border-brand border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-            <p className="text-[16px] font-semibold text-ink">Iniciando auditoría fantasma...</p>
-            <p className="text-[13px] text-ink-3 mt-2">Conectando con el backend y lanzando el agente</p>
+            <p className="text-[14px] font-semibold text-ink">Iniciando auditoría fantasma...</p>
+            <p className="text-[14px] text-ink-3 mt-2">Conectando con el backend y lanzando el agente</p>
           </div>
         </div>
       )}
