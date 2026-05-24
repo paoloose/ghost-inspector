@@ -4,3 +4,4 @@ node_modules
 client-dashboard
 .env
 .vscode
+test*
