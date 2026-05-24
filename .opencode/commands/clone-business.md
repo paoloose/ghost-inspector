@@ -13,7 +13,7 @@ First, determine a short slug for the business from the URL (e.g., `ramirezvazqu
 
 ## 1. Clone the Website
 - Replicate the target business URL as a static site.
-- Use original images and assets via their full URLs (hotlinking).
+- Download all images and assets (logos, backgrounds, photos, icons) into a local `assets/` folder. Use `curl` or `wget` via bash to fetch them. If an image cannot be downloaded, fall back to hotlinking via its original full URL. Update all references in HTML and CSS to point to the local `assets/` paths where available.
 - Keep original branding, colors, layout, and sections.
 - Add a `Ghost Shopper Audit` tracker panel (fixed bottom-left) that logs every user interaction with timestamps.
 
