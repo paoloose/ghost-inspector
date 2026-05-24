@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Iniciar Sesión - Ramírez Vázquez Bienes Raíces</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Raleway', sans-serif;
+      background: #1b1b1e;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+    .login-box {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      padding: 48px 40px;
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+    }
+    .login-box h1 {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: #4e5ac3;
+    }
+    .login-box p {
+      font-size: 14px;
+      color: rgba(255,255,255,0.5);
+      margin-bottom: 32px;
+    }
+    .login-box input {
+      width: 100%;
+      padding: 14px 18px;
+      margin-bottom: 16px;
+      font-family: 'Raleway', sans-serif;
+      font-size: 15px;
+      color: #fff;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 4px;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+    .login-box input:focus {
+      border-color: #4e5ac3;
+      background: rgba(255,255,255,0.15);
+    }
+    .login-box input::placeholder {
+      color: rgba(255,255,255,0.4);
+    }
+    .login-box button {
+      width: 100%;
+      padding: 14px;
+      font-family: 'Raleway', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: #fff;
+      background: #4e5ac3;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .login-box button:hover {
+      background: #343c82;
+    }
+    .login-box .back-link {
+      display: block;
+      margin-top: 20px;
+      font-size: 13px;
+      color: rgba(255,255,255,0.4);
+      text-decoration: none;
+    }
+    .login-box .back-link:hover {
+      color: #4e5ac3;
+    }
+    .success-msg {
+      display: none;
+      padding: 20px;
+      background: rgba(78,90,195,0.2);
+      border: 1px solid #4e5ac3;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-box" id="loginBox">
+    <h1>Iniciar Sesión</h1>
+    <p>Ingresa tus credenciales para acceder</p>
+    <form id="loginForm">
+      <input type="email" id="email" placeholder="Correo electrónico" required autocomplete="email">
+      <input type="password" id="password" placeholder="Contraseña" required autocomplete="current-password">
+      <button type="submit">Iniciar sesión</button>
+    </form>
+    <div class="success-msg" id="successMsg">
+      ¡Inicio de sesión exitoso! Bienvenido.
+    </div>
+    <a href="/" class="back-link">Volver al inicio</a>
+  </div>
+  <script>
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      var email = document.getElementById('email').value;
+      var password = document.getElementById('password').value;
+      if (email && password) {
+        document.getElementById('loginForm').style.display = 'none';
+        document.getElementById('successMsg').style.display = 'block';
+      }
+    });
+  </script>
+</body>
+</html>
