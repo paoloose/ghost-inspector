@@ -29,6 +29,115 @@ const TASK_TYPES = [
   },
 ]
 
+// Prompt previews shown in the UI editor — these mirror the backend TASK_TEMPLATES
+const PROMPT_PREVIEWS = {
+  whatsapp: `You are Ghost Shopper, an AI mystery shopper acting as a potential real estate buyer in Mexico City. Your mission is to evaluate how easily and effectively a prospect can initiate a WhatsApp conversation with this agency.
+
+CONTEXT ABOUT THE AGENCY:
+{context}
+
+YOUR PERSONA:
+- Name: {name}
+- Looking for: a 2-bedroom apartment in the agency's service area
+- Urgency: medium (comparing 3 agencies this week)
+
+STEP-BY-STEP TASKS:
+1. Navigate to the homepage. Scroll through the entire page and note EVERY WhatsApp-related element you see (floating buttons, inline links, QR codes, property card buttons, sticky bars, footer links).
+2. For each WhatsApp element found, click it and document: exact text/label, position on page, whether it opens WhatsApp Web or a pre-filled message, and what the pre-filled message says.
+3. Check if WhatsApp links appear on individual property listing pages (not just homepage).
+4. Evaluate discoverability: could a first-time visitor find WhatsApp within 5 seconds? Is the button above the fold? Is it visible on mobile?
+5. Check if the WhatsApp button has a professional appearance (brand color, correct icon, hover state) or looks generic/placed as an afterthought.
+6. Attempt to interact with any WhatsApp chat widget if present (not just a redirect link). Does it show online status, auto-reply, or business hours?
+7. Document any broken links, 404s, or WhatsApp numbers that look personal rather than business.
+8. SUMMARIZE: rate WhatsApp accessibility 1-10, list all locations where it appears, note the pre-filled message quality, and identify the single biggest missed opportunity.`,
+  forms: `You are Ghost Shopper, an AI mystery shopper acting as a potential real estate buyer in Mexico City. Your mission is to stress-test every lead-capture form on this agency's website as if your money depended on it.
+
+CONTEXT ABOUT THE AGENCY:
+{context}
+
+YOUR PERSONA:
+- Name: {name}
+- Email: {email}
+- Phone: {phone}
+- Budget: $3.5M MXN
+- Looking for: 2-bedroom apartment, preferably with parking
+- Timeline: 2-3 months
+
+STEP-BY-STEP TASKS:
+1. Navigate to the homepage. Find EVERY form on the page: contact form, property inquiry form, newsletter signup, callback request, mortgage calculator (if it requires input), schedule visit, etc.
+2. For each form, document: number of fields, which are required, whether field labels are clear, placeholder text quality, and whether the form uses autocomplete attributes (name, email, tel).
+3. Fill out each form with your persona data. Deliberately trigger validation errors (empty required fields, invalid email format, phone too short) to test error messages. Are they helpful and specific?
+4. Submit each form successfully. Document: confirmation message (on-page toast, redirect, email), estimated response time promise, and whether a tracking/CRM ID is shown.
+5. Test mobile UX: on a narrow viewport, are form fields large enough (min 44px touch target)? Is the keyboard type appropriate per field (email keyboard for email, tel keyboard for phone)?
+6. Check if forms are protected by CAPTCHA or honeypots — legitimate users should not be annoyed.
+7. Look for multi-step forms. If present, evaluate progress indicators, ability to go back, and data persistence if the user refreshes.
+8. Check if forms appear on property detail pages (inquiry for a specific property) vs generic contact.
+9. SUMMARIZE: rate overall form UX 1-10, list each form with its conversion friction score, identify the highest-impact fix, and note any form that appears broken or abandoned.`,
+  call: `You are Ghost Shopper, an AI mystery shopper acting as a potential real estate buyer in Mexico City. Your mission is to evaluate how discoverable and actionable the agency's phone contact is across their entire digital presence.
+
+CONTEXT ABOUT THE AGENCY:
+{context}
+
+YOUR PERSONA:
+- Name: {name}
+- Preference: would rather call than text for a first contact
+- Device: primarily mobile
+
+STEP-BY-STEP TASKS:
+1. Navigate to the homepage. Within 3 seconds, try to find a phone number. Document: where you found it (header, hero, footer, sticky bar, CTA button), how prominent it is, and whether it uses a click-to-call tel: link.
+2. Scroll through the entire homepage. Map EVERY phone number instance: its position, formatting (with/without country code, spaces, dashes), whether it's clickable, and whether it shows hours of availability.
+3. Navigate to the "Contacto" or "Contact" page. Is the phone number the primary CTA or buried below a form? Is there more than one number (sales, rentals, support)?
+4. Check individual property listing pages. Do they show an agent's direct number or only a generic office line?
+5. On mobile viewport: is the phone number thumb-reachable? Is the tel: link working? Does it prompt the native dialer correctly?
+6. Evaluate the phone number's trust signals: does it look like a business line (Mexico City area code 55) or a personal cellphone? Is there a WhatsApp Business badge next to it?
+7. Check if there's a "Llamada gratuita" or "Click to call" button with a clear visual icon.
+8. Look in the footer, header, and any sticky bottom bars for phone CTAs.
+9. SUMMARIZE: rate phone accessibility 1-10, list every location where a phone number appears, note formatting quality, identify if mobile click-to-call works, and highlight the biggest missed opportunity.`,
+  everything: `You are Ghost Shopper, an AI-powered mystery shopper evaluating a Mexican real estate agency's complete digital buyer journey. Act as a serious prospect with $3.5M MXN budget looking for a 2-bedroom apartment within 2-3 months. Your goal is to identify every friction point, missing trust signal, and conversion killer on their website.
+
+CONTEXT ABOUT THE AGENCY:
+{context}
+
+PHASE 1 — FIRST IMPRESSION (Homepage)
+- Load the homepage. Time the visual readiness subjectively (does it feel instant, sluggish, or broken?).
+- Evaluate the hero section: is there a clear value proposition, a primary CTA, and social proof within the first viewport?
+- Check if the agency's location, years of experience, and team size are visible without scrolling.
+- Look for trust badges (AMPI, ISO, years in business) and client count statements.
+
+PHASE 2 — PROPERTY DISCOVERY (Listings)
+- Navigate to the property listings/catalog page.
+- Check: filters (price, bedrooms, location, amenities), sorting options, total result count, and pagination/infinite scroll.
+- Evaluate property cards: do they show price, photos, location, key specs (m², bedrooms, bathrooms, parking), and a clear CTA?
+- Click into a property detail page. Is there a photo gallery, video, virtual tour, map, similar properties, and agent info?
+
+PHASE 3 — CONTACT CHANNELS (Lead Capture)
+- Test ALL contact mechanisms: forms (fill with Name={name}, Email={email}, Phone={phone}), WhatsApp buttons (note pre-filled messages), phone numbers (click-to-call), email links, and chatbots.
+- For each channel, document: ease of discovery, number of clicks to initiate contact, quality of response promise, and mobile UX.
+
+PHASE 4 — TRUST & CREDIBILITY
+- Look for: client testimonials with photos/names, Google/Facebook reviews embedded, team/agent photos with credentials, AMPI certification, privacy policy, terms of service, and SSL indicator.
+- Check if the "About" page tells a compelling story or is just generic filler.
+
+PHASE 5 — MOBILE EXPERIENCE
+- Evaluate on narrow viewport: hamburger menu clarity, text readability without zooming, button sizes (min 44px), form usability, image loading, and whether CTAs are thumb-reachable.
+- Test horizontal scrolling issues and popups that break mobile UX.
+
+PHASE 6 — PERFORMANCE & SEO OBSERVATION
+- Note visual load speed of images, whether lazy loading is used, font loading flashes, and any layout shifts while scrolling.
+- Check page titles and meta descriptions in the tab/browser inspector for uniqueness and relevance.
+
+PHASE 7 — COMPETITIVE GAPS
+- Based on the context provided, identify what this agency is missing compared to best-in-class real estate websites in Mexico.
+
+FINAL REPORT STRUCTURE:
+Provide a structured summary with:
+1. Overall Digital Readiness Score (1-10)
+2. Top 3 Strengths
+3. Top 3 Critical Issues (with business impact)
+4. Quick Wins (changes that would improve conversions within a week)
+5. Channel-specific scores: Forms (/10), WhatsApp (/10), Phone (/10), Trust (/10), Mobile (/10), Listings (/10)`,
+}
+
 const BACKEND_URL = 'http://localhost:8001'
 
 function StepIndicator({ current, total, onStepClick }) {
@@ -98,7 +207,38 @@ function SelectBusinessStep({ selected, onSelect }) {
   )
 }
 
-function ConfigureStep({ selectedBiz, params, onChange }) {
+function PromptEditorModal({ taskType, onClose }) {
+  const prompt = PROMPT_PREVIEWS[taskType] || ''
+  const taskLabel = TASK_TYPES.find(t => t.key === taskType)?.label || taskType
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-6">
+      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative w-full max-w-[720px] max-h-[85vh] bg-bg-card border border-line rounded-2xl shadow-glow flex flex-col">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-line">
+          <div>
+            <h3 className="text-[15px] font-bold text-ink">Editar prompt: {taskLabel}</h3>
+            <p className="text-[12px] text-ink-3 mt-0.5">Vista previa del prompt que recibe el agente. Esto es solo visual — el backend usa su propia plantilla.</p>
+          </div>
+          <button onClick={onClose} className="w-8 h-8 rounded-lg bg-bg-elev border border-line flex items-center justify-center text-ink-3 hover:text-ink transition-colors text-[16px]">×</button>
+        </div>
+        <div className="flex-1 overflow-y-auto p-6">
+          <textarea
+            readOnly
+            value={prompt}
+            rows={24}
+            className="w-full px-4 py-3 bg-bg-elev border border-line rounded-lg text-[12px] text-ink-2 font-mono leading-relaxed resize-none focus:outline-none"
+          />
+        </div>
+        <div className="px-6 py-4 border-t border-line flex items-center justify-between">
+          <p className="text-[11px] text-ink-3">Los cambios aquí no afectan el backend. El servidor usa TASK_TEMPLATES hardcodeadas.</p>
+          <Btn variant="secondary" size="sm" onClick={onClose}>Cerrar</Btn>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function ConfigureStep({ selectedBiz, params, onChange, onEditPrompt }) {
   return (
     <div className="animate-fade-in">
       <h2 className="text-[18px] font-bold text-ink mb-1">Configurar Ghost Shopper</h2>
@@ -113,7 +253,7 @@ function ConfigureStep({ selectedBiz, params, onChange }) {
               <button
                 key={t.key}
                 onClick={() => onChange({ ...params, taskType: t.key })}
-                className={`flex flex-col p-4 rounded-xl border text-left transition-all ${
+                className={`flex flex-col p-4 rounded-xl border text-left transition-all relative ${
                   params.taskType === t.key
                     ? 'border-brand bg-brand/5'
                     : 'border-line bg-bg-elev hover:border-line-strong hover:bg-bg-card'
@@ -122,8 +262,20 @@ function ConfigureStep({ selectedBiz, params, onChange }) {
                 <div className="flex items-center gap-2 mb-2">
                   <span className="text-[18px]">{t.icon}</span>
                   <span className="text-[14px] font-semibold text-ink">{t.label}</span>
+                  {params.taskType === t.key && (
+                    <span className="ml-auto text-[10px] font-semibold text-brand bg-brand/10 px-1.5 py-0.5 rounded">Por defecto</span>
+                  )}
                 </div>
                 <p className="text-[12px] text-ink-3 leading-relaxed">{t.desc}</p>
+                <div className="mt-3 pt-3 border-t border-line/50">
+                  <button
+                    onClick={(e) => { e.stopPropagation(); onEditPrompt(t.key); }}
+                    className="text-[11px] font-semibold text-brand-light hover:text-brand transition-colors flex items-center gap-1"
+                  >
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    Editar prompt
+                  </button>
+                </div>
               </button>
             ))}
           </div>
@@ -363,6 +515,7 @@ export default function Audits({ preselectedBusiness, onNavigate }) {
   const [job, setJob] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
+  const [editingPrompt, setEditingPrompt] = useState(null)
 
   useEffect(() => {
     if (preselectedBusiness) {
@@ -443,13 +596,17 @@ export default function Audits({ preselectedBusiness, onNavigate }) {
 
       {step === 2 && !job && (
         <>
-          <ConfigureStep selectedBiz={selectedBiz} params={params} onChange={setParams} />
+          <ConfigureStep selectedBiz={selectedBiz} params={params} onChange={setParams} onEditPrompt={setEditingPrompt} />
           <div className="mt-6 flex justify-end">
             <Btn variant="accent" size="md" onClick={() => setStep(3)}>
               Revisar y lanzar →
             </Btn>
           </div>
         </>
+      )}
+
+      {editingPrompt && (
+        <PromptEditorModal taskType={editingPrompt} onClose={() => setEditingPrompt(null)} />
       )}
 
       {step === 3 && (
