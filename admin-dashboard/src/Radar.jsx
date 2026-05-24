@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Card, CardHead, Btn } from './ui'
 import StatusBadge from './StatusBadge'
+import ReachMap from './ReachMap'
 import { businesses, audits } from './data'
 
 function BusinessList({ onSelect }) {
@@ -25,6 +26,11 @@ function BusinessList({ onSelect }) {
           </div>
           <Btn variant="accent" size="sm">+ Nuevo Audit</Btn>
         </div>
+      </div>
+
+      {/* Reach Map */}
+      <div className="mb-6">
+        <ReachMap />
       </div>
 
       <div className="bg-bg-elev border border-line rounded-lg2 overflow-hidden">
