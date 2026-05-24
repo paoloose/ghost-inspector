@@ -392,8 +392,9 @@ function RunningView({ job, onReset }) {
   const logRef = useRef(null)
 
   // Build WebSocket URL from current page origin so it works behind any proxy
-  const wsUrl = job?.id
-    ? `${window.location.protocol === 'https:' ? 'wss' : 'ws'}://${window.location.host}/ws/v1/events/${job.id}`
+  const jobId = job?.job_id || job?.id
+  const wsUrl = jobId
+    ? `${window.location.protocol === 'https:' ? 'wss' : 'ws'}://${window.location.host}/ws/v1/events/${jobId}`
     : null
 
   useEffect(() => {
@@ -445,8 +446,8 @@ function RunningView({ job, onReset }) {
               <span className="text-[10px] text-ink-3 font-mono">MJPEG</span>
             </div>
             <div className="relative aspect-video bg-black flex items-center justify-center">
-              {job?.id ? (
-                <img src={`/mjpeg/v1/watch/${job.id}`} alt="Live browser" className="w-full h-full object-contain" onError={e => { e.target.style.display = 'none' }} />
+              {jobId ? (
+                <img src={`/mjpeg/v1/watch/${jobId}`} alt="Live browser" className="w-full h-full object-contain" onError={e => { e.target.style.display = 'none' }} />
               ) : (
                 <p className="text-[13px] text-ink-3">Esperando stream...</p>
               )}
