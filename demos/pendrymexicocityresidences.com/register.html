@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Register | Pendry Residences Mexico City</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- Loading Overlay -->
+  <div id="loadingOverlay" class="loading-overlay">
+    <div class="spinner"></div>
+    <div class="loading-text" id="loadingText">Cargando...</div>
+  </div>
+
+  <!-- Header -->
+  <header class="site-header scrolled" style="background:rgba(10,10,10,0.95);">
+    <div class="container">
+      <a href="index.html" class="logo" data-track="click" data-detail="logo-home">
+        <img src="https://pendrymexicocityresidences.com/wp-content/uploads/2025/11/PRMX-Logo-white-scaled.png" alt="Pendry Residences Mexico City" onerror="this.style.display='none'">
+      </a>
+      <nav class="main-nav">
+        <a href="index.html#the_city">The City</a>
+        <a href="index.html#the_residences">The Residences</a>
+        <a href="index.html#inquiries">Inquire</a>
+      </nav>
+      <div class="header-actions">
+        <a href="index.html" class="btn">Back to Home</a>
+      </div>
+    </div>
+  </header>
+
+  <main style="padding-top:120px; min-height:100vh; display:flex; align-items:center; justify-content:center;">
+    <div class="container" style="max-width:480px;">
+      <div class="text-center" style="margin-bottom:2rem;">
+        <h2 class="section-title" style="font-size:2rem;">Create Account</h2>
+        <p class="section-text">Register to request availability and ownership opportunities.</p>
+      </div>
+
+      <form id="registerForm" novalidate>
+        <div class="form-group">
+          <label for="regName">Name</label>
+          <input type="text" id="regName" name="name" required data-track="focus" data-detail="register-name-focus">
+          <span class="error-msg">Please enter your name.</span>
+        </div>
+        <div class="form-group">
+          <label for="regEmail">Email <span style="color:var(--color-accent)">*</span></label>
+          <input type="email" id="regEmail" name="email" required data-track="focus" data-detail="register-email-focus">
+          <span class="error-msg">Please enter a valid email address.</span>
+        </div>
+        <div class="form-group">
+          <label for="regPassword">Password <span style="color:var(--color-accent)">*</span></label>
+          <input type="password" id="regPassword" name="password" required minlength="4" data-track="focus" data-detail="register-password-focus">
+          <span class="error-msg">Please enter a password (min 4 characters).</span>
+        </div>
+        <button type="submit" class="btn btn-solid" style="width:100%;" data-track="submit" data-detail="register-form-submit">
+          <span class="btn-spinner"></span>
+          <span class="btn-text">Create Account</span>
+        </button>
+      </form>
+
+      <div class="form-success" id="registerSuccess">
+        <h3>Welcome!</h3>
+        <p>Your account has been created successfully. Redirecting to the homepage...</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer simplified -->
+  <footer class="site-footer" style="padding:2rem 0;">
+    <div class="container text-center">
+      <p style="font-size:.8rem; color:#555;">© 2026 Pendry Residences Mexico City. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- Ghost Shopper Audit -->
+  <aside class="ghost-panel" id="ghostPanel">
+    <div class="ghost-header">
+      <span>Ghost Shopper Audit</span>
+      <button class="ghost-toggle" id="ghostToggle">−</button>
+    </div>
+    <ul class="ghost-log" id="ghostLog"></ul>
+  </aside>
+
+  <script src="script.js"></script>
+</body>
+</html>
