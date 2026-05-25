@@ -92,3 +92,10 @@ Write the complete source code for the cloned site into `demos/<business-slug>/`
 - `script.js`
 
 Verify the files are created in the correct directory before finishing.
+
+## 9. Commit and Push
+After verifying everything is correct, commit the new demo site to the repo and push it:
+- Stage all files under `demos/<business-slug>/`.
+- Write a concise commit message following the repo style (e.g., `feat(demo): add <business-name> bot-ready clone`).
+- Push to `origin/main` (or the current upstream branch).
+- Return the commit hash and the pushed branch name.
