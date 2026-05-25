@@ -63,6 +63,49 @@ a {
 }
 
 /* ==============================================
+   LOADING OVERLAY
+   ============================================== */
+
+.page-loader {
+  position: fixed;
+  inset: 0;
+  background: rgba(27, 27, 30, 0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 16px;
+  z-index: 9999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.page-loader--visible {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.page-loader__spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(255,255,255,0.2);
+  border-top-color: var(--color-accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.page-loader__text {
+  font-size: 14px;
+  color: rgba(255,255,255,0.7);
+  letter-spacing: 0.05em;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ==============================================
    HEADER
    ============================================== */
 
@@ -140,6 +183,7 @@ a {
   display: flex;
   list-style: none;
   gap: 8px;
+  align-items: center;
 }
 
 .header__link {
@@ -176,6 +220,39 @@ a {
   border-color: var(--color-accent);
   background: var(--color-accent);
   color: var(--color-white);
+}
+
+/* User session indicator */
+.header__user-session {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-left: 8px;
+}
+
+.header__user-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-accent);
+  letter-spacing: 0.02em;
+}
+
+.header__logout {
+  background: none;
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 4px;
+  padding: 4px 10px;
+  font-family: var(--font-primary);
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.7);
+  cursor: pointer;
+  transition: border-color 0.3s, color 0.3s;
+}
+
+.header__logout:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
 }
 
 /* ==============================================
@@ -494,6 +571,7 @@ a {
   overflow: hidden;
   border-radius: 2px;
   aspect-ratio: 16 / 9;
+  background: linear-gradient(135deg, var(--color-bg-dark), var(--color-bg-darker));
 }
 
 .property-card img {
@@ -521,8 +599,20 @@ a {
   padding: 15px;
 }
 
-.property-card--interactive:hover .property-card__overlay {
+/* Always show overlay on touch devices; fallback when images fail */
+.property-card--interactive:hover .property-card__overlay,
+.property-card--interactive:focus-within .property-card__overlay,
+.property-card--interactive:active .property-card__overlay,
+.property-card--fallback .property-card__overlay {
   opacity: 1;
+}
+
+/* Mobile: always show overlay so users can interact */
+@media (hover: none) and (pointer: coarse) {
+  .property-card--interactive .property-card__overlay {
+    opacity: 1;
+    background: rgba(0, 0, 0, 0.55);
+  }
 }
 
 .property-card__label {
@@ -547,6 +637,11 @@ a {
 
 .property-card__visit-btn:hover {
   background: var(--color-accent-dark);
+}
+
+.property-card__visit-btn:disabled {
+  opacity: 0.7;
+  cursor: wait;
 }
 
 .property-card__whatsapp {
@@ -806,11 +901,20 @@ a {
   border-radius: 4px;
   cursor: pointer;
   transition: background 0.3s ease, transform 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .contact__submit:hover {
   background: var(--color-accent-dark);
   transform: translateY(-1px);
+}
+
+.contact__submit:disabled {
+  opacity: 0.7;
+  cursor: wait;
+  transform: none;
 }
 
 .contact__success {
@@ -1018,6 +1122,7 @@ a.contact__info-link:hover {
     gap: 8px;
     transform: translateX(100%);
     transition: transform 0.3s ease;
+    align-items: stretch;
   }
 
   .header__menu--open {
@@ -1028,6 +1133,19 @@ a.contact__info-link:hover {
     font-size: 16px;
     padding: 14px 16px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .header__link--login {
+    margin-left: 0;
+    text-align: center;
+  }
+
+  .header__user-session {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 14px 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    gap: 8px;
   }
 
   .hero__content {
