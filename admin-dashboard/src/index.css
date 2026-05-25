@@ -8,10 +8,17 @@
     -moz-osx-font-smoothing: grayscale;
     background: #0B0D12;
     color: #F0F1F5;
+    font-size: 16px;
   }
 
   body {
     font-family: 'Geist', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+  }
+
+  #root {
+    zoom: 1.15;
   }
 
   ::-webkit-scrollbar {
