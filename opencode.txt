@@ -1,0 +1,7 @@
+opencode -s ses_1a8b9245bffe6lAdveZ846o3dW
+
+test.py
+opencode -s ses_1a43a4845ffeXNss8zgSBiO2TO
+
+commands
+opencode -s ses_1a37c6e97ffe0w8zPhPIibbdrW

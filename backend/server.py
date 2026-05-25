@@ -75,15 +75,13 @@ async def run_endpoint(request):
     # Launch agent in background
     asyncio.create_task(run_agent(job, _job_manager))
 
-    host = request.headers.get("host", f"localhost:{API_PORT}")
-    scheme = request.url.scheme
-
     return JSONResponse(
         {
             "job_id": job.id,
             "status": "running",
-            "mjpeg_url": f"{scheme}://{host}/mjpeg/v1/watch/{job.id}",
-            "events_ws_url": f"ws://{host}/ws/v1/events/{job.id}",
+            # Relative paths — frontend constructs full URLs from window.location
+            "mjpeg_url": f"/mjpeg/v1/watch/{job.id}",
+            "events_ws_url": f"/ws/v1/events/{job.id}",
             "created_at": job.created_at.isoformat() + "Z",
         }
     )
