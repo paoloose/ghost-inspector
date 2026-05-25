@@ -18,19 +18,7 @@ export const businesses = [
     employees: '4-10',
     status: 'finished',
     score: 6.2,
-    context: `Ramírez Vázquez Bienes Raíces es una agencia inmobiliaria con sede en Ciudad de México, México. Fundada en 2019, opera con un equipo de 4-10 personas. Su propuesta de valor se centra en brindar seguridad y certeza jurídica tanto a vendedores como compradores.
-
-Páginas encontradas: 14 | Imágenes: 48 | Formularios: 2
-Canales: WhatsApp ✓, Email ✓, Teléfono ✓, Chatbot ✗, Login ✓, Blog ✗
-Propiedades listadas: 12
-
-Performance: Mobile 42/100, Desktop 71/100, FCP 2.8s, LCP 4.1s, CLS 0.12
-SEO: Sin schema markup, sin Open Graph, sin Twitter Cards
-Trust: Sin testimonios, sin certificaciones, sin reviews públicas
-UX: Sin precios visibles, sin tour virtual, CTA sí presente
-
-Keywords: bienes raíces, departamentos, cdmx, inmobiliaria
-Redes: Facebook, Instagram, YouTube, X/Twitter`,
+    context: `Ramírez Vázquez Bienes Raíces es una agencia inmobiliaria con sede en Ciudad de México, México. Fundada en 2019, opera con un equipo de 4-10 personas. Su propuesta de valor se centra en brindar seguridad y certeza jurídica tanto a vendedores como compradores.`,
     lastAuditAt: '2025-05-24T22:00:00Z',
     crawlData: {
       pagesFound: 14,
@@ -113,16 +101,7 @@ Redes: Facebook, Instagram, YouTube, X/Twitter`,
     status: 'waiting',
     score: 7.8,
     lastAuditAt: '2025-05-20T14:30:00Z',
-    context: `Inmobiliaria Torres es una agencia de bienes raíces con sede en Guadalajara, Jalisco. Fundada en 2015, cuenta con un equipo de 11-25 personas. Es una inmobiliaria establecida con buena presencia digital.
-
-Páginas encontradas: 28 | Imágenes: 112 | Formularios: 4
-Canales: WhatsApp ✓, Email ✓, Teléfono ✓, Chatbot ✓, Login ✗, Blog ✓
-Propiedades listadas: 34
-
-Performance: Mobile 78/100, Desktop 91/100
-SEO: Schema markup presente, Open Graph presente
-Trust: Testimonios presentes, certificaciones presentes, reviews presentes
-UX: Precios visibles ✓, tour virtual ✓, CTA presente`,
+    context: `Inmobiliaria Torres es una agencia de bienes raíces con sede en Guadalajara, Jalisco. Fundada en 2015, cuenta con un equipo de 11-25 personas. Es una inmobiliaria establecida con buena presencia digital.`,
     crawlData: {
       pagesFound: 28, totalImages: 112, formsDetected: 4,
       hasWhatsApp: true, hasEmail: true, hasPhone: true,
@@ -149,6 +128,7 @@ UX: Precios visibles ✓, tour virtual ✓, CTA presente`,
     status: 'enrolled',
     score: 8.4,
     lastAuditAt: '2025-05-18T09:15:00Z',
+    context: `Grupo Casanova es una inmobiliaria comercial con sede en Monterrey, Nuevo León. Fundada en 2012, opera con un equipo de 25-50 personas. Especializada en oficinas y locales comerciales en el área metropolitana de Monterrey.`,
     crawlData: {
       pagesFound: 52, totalImages: 210, formsDetected: 6,
       hasWhatsApp: true, hasEmail: true, hasPhone: true,
@@ -175,6 +155,7 @@ UX: Precios visibles ✓, tour virtual ✓, CTA presente`,
     status: 'auditing',
     score: null,
     lastAuditAt: null,
+    context: `Home CDMX es una inmobiliaria de lujo con sede en Ciudad de México. Fundada en 2021, opera con un equipo pequeño de 2-5 personas. Especializada en departamentos de lujo en zonas como Polanco y Condesa.`,
     crawlData: {
       pagesFound: 8, totalImages: 24, formsDetected: 1,
       hasWhatsApp: true, hasEmail: true, hasPhone: false,
