@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pendry Mexico | Contemporary Luxury Residences in Mexico City</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- Loading Overlay -->
+  <div id="loadingOverlay" class="loading-overlay">
+    <div class="spinner"></div>
+    <div class="loading-text" id="loadingText">Cargando...</div>
+  </div>
+
+  <!-- Header -->
+  <header class="site-header" id="siteHeader">
+    <div class="container">
+      <a href="index.html" class="logo" data-track="click" data-detail="logo-home">
+        <img src="https://pendrymexicocityresidences.com/wp-content/uploads/2025/11/PRMX-Logo-white-scaled.png" alt="Pendry Residences Mexico City" onerror="this.style.display='none'">
+      </a>
+
+      <nav class="main-nav" id="mainNav">
+        <a href="#the_city" data-track="click" data-detail="nav-the_city">The City</a>
+        <a href="#the_backdrop" data-track="click" data-detail="nav-the_backdrop">The Backdrop</a>
+        <a href="#the_residences" data-track="click" data-detail="nav-the_residences">The Residences</a>
+        <a href="#the_offerings" data-track="click" data-detail="nav-the_offerings">The Offerings</a>
+        <a href="#the_culture" data-track="click" data-detail="nav-the_culture">The Culture</a>
+        <a href="#the_opportunity" data-track="click" data-detail="nav-the_opportunity">The Opportunity</a>
+      </nav>
+
+      <div class="header-actions">
+        <a href="register.html" class="btn register-link" data-track="click" data-detail="nav-register">Register</a>
+        <div class="user-indicator" id="userIndicator">
+          <span>Hola, <span id="userName">user</span></span>
+          <button class="btn btn-small" id="logoutBtn" data-track="click" data-detail="logout">Cerrar sesión</button>
+        </div>
+        <a href="#inquiries" class="btn btn-solid" data-track="click" data-detail="nav-inquire">Inquire</a>
+        <button class="hamburger" id="hamburger" aria-label="Menu" data-track="click" data-detail="hamburger-toggle">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Nav -->
+  <div class="mobile-overlay" id="mobileOverlay"></div>
+  <nav class="mobile-nav" id="mobileNav">
+    <a href="#the_city" class="mobile-link">The City</a>
+    <a href="#the_backdrop" class="mobile-link">The Backdrop</a>
+    <a href="#the_residences" class="mobile-link">The Residences</a>
+    <a href="#the_offerings" class="mobile-link">The Offerings</a>
+    <a href="#the_culture" class="mobile-link">The Culture</a>
+    <a href="#the_opportunity" class="mobile-link">The Opportunity</a>
+    <a href="register.html" class="mobile-link register-link">Register</a>
+    <a href="#inquiries" class="btn btn-solid mobile-link" style="margin-top:auto;">Inquire</a>
+  </nav>
+
+  <main>
+    <!-- Hero -->
+    <section class="hero" id="hero">
+      <div class="hero-slide active" style="background-image:url('https://pendrymexicocityresidences.com/wp-content/uploads/2026/05/header-slider-1.jpg')"></div>
+      <div class="hero-slide" style="background-image:url('https://pendrymexicocityresidences.com/wp-content/uploads/2026/05/header-slider-2.jpg')"></div>
+      <div class="hero-slide" style="background-image:url('https://pendrymexicocityresidences.com/wp-content/uploads/2026/05/header-slider-3.jpg')"></div>
+      <div class="hero-slide" style="background-image:url('https://pendrymexicocityresidences.com/wp-content/uploads/2026/05/header-slider-4.jpg')"></div>
+
+      <div class="hero-content">
+        <p class="sub">Priced from $1.5M</p>
+        <h1>Luxury Residences In Mexico City</h1>
+        <h2>20 Private Residences in Roma Norte</h2>
+        <a href="#inquiries" class="btn btn-solid btn-cta" data-track="click" data-detail="hero-cta-view_residences">View Residences &amp; Pricing</a>
+      </div>
+    </section>
+
+    <!-- Intro -->
+    <section class="intro text-center section-padding" id="intro">
+      <div class="container">
+        <p>Pendry Residences Mexico City offers a limited collection of 20 private homes in Roma Norte, one of the city’s most sought-after neighborhoods. A 2026 Gold Urban Design &amp; Architecture Award winner, it stands among Mexico City’s most distinctive new addresses, defined by turnkey design, refined materials, and Pendry’s legacy of global hospitality.</p>
+        <p style="margin-top:1rem;">Each Residence opens to a private terrace overlooking Durango’s tree‑lined canopy—a rare balance of sanctuary and city. Just steps from home, Roma Norte unfolds in Art Deco architecture, hidden galleries, design‑forward boutiques, and sun‑drenched courtyards that lead into cafés and moments of discovery.</p>
+      </div>
+    </section>
+
+    <!-- Residential Gallery -->
+    <section class="section-padding" id="the_backdrop">
+      <div class="container">
+        <div class="image-grid grid-4">
+          <div class="img-card" data-label="Residence View">
+            <img src="https://pendrymexicocityresidences.com/wp-content/uploads/2026/05/resiidential1.jpg" alt="Residence" onerror="this.closest('.img-card').classList.add('img-fallback')">
+          </div>
+          <div class="img-card" data-label="Interior Detail">
+            <img src="https://pendrymexicocityresidences.com/wp-content/uploads/2026/05/resiidential2.jpg" alt="Interior" onerror="this.closest('.img-card').classList.add('img-fallback')">
+          </div>
+          <div class="img-card" data-label="Living Space">
+            <img src="https://pendrymexicocityresidences.com/wp-content/uploads/2026/05/resiidential3.jpg" alt="Living" onerror="this.closest('.img-card').classList.add('img-fallback')">
+          </div>
+          <div class="img-card" data-label="Terrace View">
+            <img src="https://pendrymexicocityresidences.com/wp-content/uploads/2026/05/resiidential4.jpg" alt="Terrace" onerror="this.closest('.img-card').classList.add('img-fallback')">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- The City -->
+    <section class="section-padding" id="the_city">
+      <div class="container">
+        <div class="text-center">
+          <p class="section-label">Roma Norte</p>
+          <h2 class="section-title">Mexico City’s Dynamic Cultural Address</h2>
+          <p class="section-text" style="margin:0 auto 2rem;">To live here is to stand at the center of one of the world’s most design-forward cultural districts. Tree‑lined streets come alive with markets, mezcalerías, and midnight galleries. Rooted in creativity and global sophistication, Roma Norte leads the way in walkable, design‑forward, and endlessly inspiring living.</p>
+        </div>
+        <div class="image-grid grid-3">
+          <div class="img-card" data-label="Roma Norte Street">
+            <img src="https://pendrymexicocityresidences.com/wp-content/uploads/2026/05/roma-norte.jpg" alt="Roma Norte" onerror="this.closest('.img-card').classList.add('img-fallback')">
+          </div>
+          <div class="img-card" data-label="Roma Norte Gallery">
+            <img src="https://pendrymexicocityresidences.com/wp-content/uploads/2026/05/roma-norte1.jpg" alt="Roma Norte 1" onerror="this.closest('.img-card').classList.add('img-fallback')">
+          </div>
+          <div class="img-card" data-label="Roma Norte Café">
+            <img src="https://pendrymexicocityresidences.com/wp-content/uploads/2026/05/roma-norte2.jpg" alt="Roma Norte 2" onerror="this.closest('.img-card').classList.add('img-fallback')">
+          </div>
+          <div class="img-card" data-label="Roma Norte Architecture">
+            <img src="https://pendrymexicocityresidences.com/wp-content/uploads/2026/05/roma-norte3.jpg" alt="Roma Norte 3" onerror="this.closest('.img-card').classList.add('img-fallback')">
+          </div>
+          <div class="img-card" data-label="Roma Norte Market">
+            <img src="https://pendrymexicocityresidences.com/wp-content/uploads/2026/05/roma-norte4.jpg" alt="Roma Norte 4" onerror="this.closest('.img-card').classList.add('img-fallback')">
+          </div>
+          <div class="img-card" data-label="Roma Norte Park">
+            <img src="https://pendrymexicocityresidences.com/wp-content/uploads/2026/05/roma-norte5.jpg" alt="Roma Norte 5" onerror="this.closest('.img-card').classList.add('img-fallback')">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- The Residences -->
+    <section class="section-padding" id="the_residences">
+      <div class="container">
+        <div class="split-section reverse">
+          <div class="media">
+            <img src="https://pendrymexicocityresidences.com/wp-content/uploads/2026/05/Living-Room-Crop.jpg" alt="Living Room" onerror="this.style.display='none';this.parentElement.classList.add('img-fallback');this.parentElement.setAttribute('data-label','Living Room')">
+          </div>
+          <div>
+            <p class="section-label">Own a Pendry Residence in Roma Norte</p>
+            <h2 class="section-title">A Luxury Offering from Montage</h2>
+            <p class="section-text">Spanning floors four through seven of Pendry Mexico City’s boutique hotel are 20 branded Residences. A dedicated Owners’ elevator provides direct access to exquisitely furnished two- and three-bedroom homes in Roma Norte. Inside, natural textures and refined finishes shape expansive light-filled living areas, spa-inspired baths, and refined kitchens. Behind every detail is Pendry’s commitment to care, ensuring a home that is effortlessly maintained and always ready, whether you are home or away.</p>
+            <div class="stats-grid">
+              <div class="stat-item">
+                <h4>Residences</h4>
+                <p>1–3 Bedrooms<br>860–2,300 Sq Ft</p>
+              </div>
+              <div class="stat-item">
+                <h4>Design</h4>
+                <p>Interiors by AvroKO<br>Rooftop Pool</p>
+              </div>
+              <div class="stat-item">
+                <h4>Architecture</h4>
+                <p>Central de Arquitectura<br>&amp; IZ Arquitectos</p>
+              </div>
+            </div>
+            <a href="#inquiries" class="btn btn-solid btn-cta" data-track="click" data-detail="residences-cta-floor_plans">View Floor Plans</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- The Offerings -->
+    <section class="section-padding" id="the_offerings">
+      <div class="container">
+        <div class="text-center">
+          <p class="section-label">The Pendry Way of Living</p>
+          <h2 class="section-title">Every Amenity Considered</h2>
+          <p class="section-text" style="margin:0 auto 2rem;">Discover a life anchored in intuitive service and thoughtful amenities. From valet parking and 24‑hour concierge care to the sanctuary of Spa Pendry, every detail is designed to make life feel effortless. Purposeful spaces support connection, productivity, and wellness. Three chef‑driven dining venues bring the city’s flavors close, while the panoramic rooftop pool becomes the place for sunsets and aperitifs.</p>
+          <p class="section-text" style="margin:0 auto 2rem;"><em>And that’s only the beginning.</em></p>
+        </div>
+
+        <div class="image-grid grid-2" style="margin-bottom:3rem;">
+          <div class="img-card" data-label="Amenity">
+            <img src="https://pendrymexicocityresidences.com/wp-content/uploads/2026/05/pendryway1.jpg" alt="Pendry Way 1" onerror="this.closest('.img-card').classList.add('img-fallback')">
+          </div>
+          <div class="img-card" data-label="Amenity">
+            <img src="https://pendrymexicocityresidences.com/wp-content/uploads/2026/05/pendryway2.jpg" alt="Pendry Way 2" onerror="this.closest('.img-card').classList.add('img-fallback')">
+          </div>
+          <div class="img-card" data-label="Amenity">
+            <img src="https://pendrymexicocityresidences.com/wp-content/uploads/2026/05/pendryway3.jpg" alt="Pendry Way 3" onerror="this.closest('.img-card').classList.add('img-fallback')">
+          </div>
+          <div class="img-card" data-label="Amenity">
+            <img src="https://pendrymexicocityresidences.com/wp-content/uploads/2026/05/pendryway4.jpg" alt="Pendry Way 4" onerror="this.closest('.img-card').classList.add('img-fallback')">
+          </div>
+        </div>
+
+        <ul class="amenity-list">
+          <li>Lobby / Reception &amp; Lobby Patio Lounge</li>
+          <li>Concierge, Security, Valet, Underground Parking</li>
+          <li>Spa Pendry</li>
+          <li>Cafecito</li>
+          <li>Signature Restaurant</li>
+          <li>Rooftop Restaurant &amp; Bar</li>
+          <li>Rooftop Pool</li>
+          <li>Lobby Bar</li>
+          <li>Fitness Center</li>
+          <li>Meeting Room</li>
+          <li>Private Elevators for Owners</li>
+          <li>Owners’ Lounge</li>
+        </ul>
+
+        <div class="text-center" style="margin-top:2rem;">
+          <a href="#inquiries" class="btn btn-solid btn-cta" data-track="click" data-detail="offerings-cta-amenities">Explore the Amenities</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- The Culture -->
+    <section class="section-padding" id="the_culture">
+      <div class="container">
+        <div class="split-section">
+          <div>
+            <p class="section-label">The Culture – Roma Norte, Mexico City</p>
+            <h2 class="section-title">Chosen for the Discerning</h2>
+            <p class="section-text">At Pendry Residences Mexico City, discovery begins just outside your door. Cafes, galleries, and boutiques spill onto Durango and Colima with fragrance, fashion, and design. Taquerías hum late into the night, while the leafy paths of Plaza Río de Janeiro and the gardens of Parque México offer quiet retreat. This is Roma Norte, the city’s most coveted place to live.</p>
+            <a href="#inquiries" class="btn btn-solid btn-cta" data-track="click" data-detail="culture-cta-intro">Schedule a Private Introduction</a>
+          </div>
+          <div class="image-grid grid-2">
+            <div class="img-card" data-label="Culture Dining">
+              <img src="https://pendrymexicocityresidences.com/wp-content/uploads/2026/05/culture-dining.jpg" alt="Culture Dining" onerror="this.closest('.img-card').classList.add('img-fallback')">
+            </div>
+            <div class="img-card" data-label="Culture Scene">
+              <img src="https://pendrymexicocityresidences.com/wp-content/uploads/2026/05/culture1.jpg" alt="Culture 1" onerror="this.closest('.img-card').classList.add('img-fallback')">
+            </div>
+            <div class="img-card" data-label="Culture Art">
+              <img src="https://pendrymexicocityresidences.com/wp-content/uploads/2026/05/culture2.jpg" alt="Culture 2" onerror="this.closest('.img-card').classList.add('img-fallback')">
+            </div>
+            <div class="img-card" data-label="Culture Street">
+              <img src="https://pendrymexicocityresidences.com/wp-content/uploads/2026/05/culture3.jpg" alt="Culture 3" onerror="this.closest('.img-card').classList.add('img-fallback')">
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- The Opportunity -->
+    <section class="section-padding" id="the_opportunity">
+      <div class="container">
+        <div class="split-section reverse">
+          <div class="media">
+            <img src="https://pendrymexicocityresidences.com/wp-content/uploads/2025/11/outdoor-sculpture-e1764100755867.jpg" alt="Outdoor Sculpture" onerror="this.style.display='none';this.parentElement.classList.add('img-fallback');this.parentElement.setAttribute('data-label','Outdoor Sculpture')">
+          </div>
+          <div>
+            <p class="section-label">The Opportunity</p>
+            <h2 class="section-title">Unmistakably Pendry</h2>
+            <p class="section-text">Pendry extends a tradition of hospitality across iconic destinations in the United States and abroad. Owners enjoy privileges across the global portfolio of Montage and Pendry Hotels &amp; Resorts. Timeless heritage transcends into a modern era. Service is anticipated. Attention is intuitive. Every detail considered. A way of life that is grounded, yet unscripted.</p>
+            <a href="#inquiries" class="btn btn-solid btn-cta" data-track="click" data-detail="opportunity-cta-intro">Schedule a Private Introduction</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Inquiry Form -->
+    <section class="section-padding form-section" id="inquiries">
+      <div class="container">
+        <div class="text-center" style="margin-bottom:3rem;">
+          <h2 class="section-title">Access Brochure &amp; Floor Plans</h2>
+          <p class="section-text" style="margin:0 auto;">Complete the form for instant access to the digital Residence brochure, sample floor plans and layouts, and a curated map of Roma Norte.</p>
+        </div>
+
+        <form id="inquiryForm" novalidate>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="fname">First Name <span style="color:var(--color-accent)">*</span></label>
+              <input type="text" id="fname" name="fname" required data-track="focus" data-detail="form-fname-focus">
+              <span class="error-msg">Please enter your first name.</span>
+            </div>
+            <div class="form-group">
+              <label for="lname">Last Name <span style="color:var(--color-accent)">*</span></label>
+              <input type="text" id="lname" name="lname" required data-track="focus" data-detail="form-lname-focus">
+              <span class="error-msg">Please enter your last name.</span>
+            </div>
+            <div class="form-group">
+              <label for="email">Email <span style="color:var(--color-accent)">*</span></label>
+              <input type="email" id="email" name="email" required data-track="focus" data-detail="form-email-focus">
+              <span class="error-msg">Please enter a valid email address.</span>
+            </div>
+            <div class="form-group">
+              <label for="phone">Phone <span style="color:var(--color-accent)">*</span></label>
+              <input type="tel" id="phone" name="phone" required data-track="focus" data-detail="form-phone-focus">
+              <span class="error-msg">Please enter your phone number.</span>
+            </div>
+            <div class="form-group full">
+              <label for="postcode">Post Code <span style="color:var(--color-accent)">*</span></label>
+              <input type="text" id="postcode" name="postcode" required data-track="focus" data-detail="form-postcode-focus">
+              <span class="error-msg">Please enter your post code.</span>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-solid" style="width:100%;" data-track="submit" data-detail="inquiry-form-submit">
+            <span class="btn-spinner"></span>
+            <span class="btn-text">Request Access</span>
+          </button>
+
+          <p class="form-legal">By clicking the submit form, you confirm you have read and accept our <a href="#" class="external-link" data-track="click" data-detail="privacy-policy">Privacy Policy</a> and <a href="#" class="external-link" data-track="click" data-detail="terms-of-use">Terms of Use</a> and consent to receive communications from representatives of MEXICO CITY RESIDENTIAL DEVELOPMENT GROUP, LLC.</p>
+        </form>
+
+        <div class="form-success" id="formSuccess">
+          <h3>Thank You</h3>
+          <p>Your request has been received. Check your inbox for the brochure and floor plans.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <img src="https://pendrymexicocityresidences.com/wp-content/uploads/2025/11/PENDRY_CDMX_Rose-Monogram_Copper.png" alt="Pendry Monogram" onerror="this.style.display='none'">
+          <p>Pendry Residences Mexico City<br>Durango 259<br>Colonia Roma Norte, Cuauhtémoc,<br>06700 Ciudad de México, CDMX<br>México</p>
+          <p style="margin-top:1rem;">
+            <a href="tel:+525529196649" class="contact-link" data-track="click" data-detail="footer-phone">Tel: +52 5529196649</a><br>
+            <a href="mailto:inquiry@pendryresidencesmexicocity.com" class="contact-link" data-track="click" data-detail="footer-email">inquiry@pendryresidencesmexicocity.com</a>
+          </p>
+        </div>
+        <div class="footer-col">
+          <h5>Destinations</h5>
+          <a href="#" class="external-link" data-track="click" data-detail="footer-dest-baltimore">Baltimore</a>
+          <a href="#" class="external-link" data-track="click" data-detail="footer-dest-chicago">Chicago</a>
+          <a href="#" class="external-link" data-track="click" data-detail="footer-dest-nyc">New York</a>
+          <a href="#" class="external-link" data-track="click" data-detail="footer-dest-sd">San Diego</a>
+          <a href="#" class="external-link" data-track="click" data-detail="footer-dest-dc">Washington D.C.</a>
+        </div>
+        <div class="footer-col">
+          <h5>Coming Soon</h5>
+          <a href="#" class="external-link" data-track="click" data-detail="footer-coming-mexico">Mexico City</a>
+          <a href="#" class="external-link" data-track="click" data-detail="footer-coming-barbados">Barbados</a>
+          <a href="#" class="external-link" data-track="click" data-detail="footer-coming-nashville">Nashville</a>
+          <a href="#" class="external-link" data-track="click" data-detail="footer-coming-punta">Punta Mita</a>
+          <a href="#" class="external-link" data-track="click" data-detail="footer-coming-tampa">Tampa</a>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>Operated by Mexico City Residential Development Group, LLC Authorized Sales &amp; Marketing Representative<br>© 2026. All rights reserved.</p>
+        <p style="margin-top:.5rem;">
+          <a href="#" class="external-link" data-track="click" data-detail="footer-privacy">Privacy Policy</a> |
+          <a href="#" class="external-link" data-track="click" data-detail="footer-terms">Terms of Use</a>
+        </p>
+        <img src="https://pendrymexicocityresidences.com/wp-content/uploads/2025/11/eho_gray.png" alt="EHO" style="margin-top:1rem; opacity:.5; height:32px;" onerror="this.style.display='none'">
+      </div>
+    </div>
+  </footer>
+
+  <!-- WhatsApp Float -->
+  <a href="https://wa.me/525529196649" class="whatsapp-float" id="whatsappFloat" target="_blank" rel="noopener" data-track="click" data-detail="whatsapp-float">
+    <svg viewBox="0 0 24 24" fill="white" width="28" height="28"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.447-.521.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.521-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.134 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+  </a>
+
+  <!-- Ghost Shopper Audit -->
+  <aside class="ghost-panel" id="ghostPanel">
+    <div class="ghost-header">
+      <span>Ghost Shopper Audit</span>
+      <button class="ghost-toggle" id="ghostToggle">−</button>
+    </div>
+    <ul class="ghost-log" id="ghostLog"></ul>
+  </aside>
+
+  <script src="script.js"></script>
+</body>
+</html>
