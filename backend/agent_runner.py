@@ -7,6 +7,7 @@ import base64
 import io
 import json
 import logging
+import traceback
 from datetime import datetime
 from typing import TYPE_CHECKING
 
@@ -88,57 +89,90 @@ async def start_screencast(browser_session, job: "Job") -> None:
 # Step extraction from agent history
 # ---------------------------------------------------------------------------
 
-def _extract_step_info(agent) -> dict | None:
-    """Extract the latest step info from agent history."""
+def _extract_step_info(agent, step_index: int) -> dict | None:
+    """Extract step info from agent history at the given index."""
     history = getattr(agent, "history", None)
     if not history:
+        logger.debug("_extract_step_info: no history attribute")
         return None
 
-    # browser_use history is an AgentHistoryList or similar
-    # We try to read the last item
     try:
-        # Attempt 1: list-like access
-        if hasattr(history, "__len__") and len(history) > 0:
-            last = history[-1]
-        else:
+        hist_len = len(history)
+        if hist_len == 0 or step_index >= hist_len:
             return None
-    except Exception:
+        entry = history[step_index]
+    except Exception as exc:
+        logger.debug(f"_extract_step_info: history access error: {exc}")
         return None
 
     thought = ""
     action = ""
     action_details: dict = {}
     url = ""
-    step_number = 0
 
-    # last might be an AgentHistory object or dict
-    if hasattr(last, "model_output") and last.model_output:
-        mo = last.model_output
-        if hasattr(mo, "current_state") and mo.current_state:
-            cs = mo.current_state
-            thought = getattr(cs, "evaluation_previous_goal", "") or getattr(cs, "memory", "") or ""
-            step_number = getattr(cs, "step_number", 0) or 0
-        if hasattr(mo, "action") and mo.action:
-            acts = mo.action
-            if acts and len(acts) > 0:
-                first = acts[0]
-                if hasattr(first, "model_dump"):
-                    action_details = first.model_dump()
-                elif isinstance(first, dict):
-                    action_details = first
-                action = action_details.get("type", str(action_details))
+    # Try multiple access patterns for browser_use's AgentHistory object
+    try:
+        # Pattern 1: model_output.current_state (browser_use >= 0.12)
+        if hasattr(entry, "model_output") and entry.model_output:
+            mo = entry.model_output
+            if hasattr(mo, "current_state") and mo.current_state:
+                cs = mo.current_state
+                thought = getattr(cs, "evaluation_previous_goal", "") or getattr(cs, "memory", "") or ""
+            if hasattr(mo, "action") and mo.action:
+                acts = mo.action
+                if acts and len(acts) > 0:
+                    first = acts[0]
+                    if hasattr(first, "model_dump"):
+                        action_details = first.model_dump()
+                    elif isinstance(first, dict):
+                        action_details = first
+                    else:
+                        action_details = {"raw": str(first)}
+                    action = action_details.get("type", str(action_details)[:80])
 
-    if hasattr(last, "state") and last.state:
-        st = last.state
-        url = getattr(st, "url", "") or ""
+        # Pattern 2: direct dict access
+        elif isinstance(entry, dict):
+            thought = entry.get("thought", "") or entry.get("memory", "")
+            action_details = entry.get("action", {})
+            action = action_details.get("type", str(action_details)[:80]) if isinstance(action_details, dict) else str(action_details)[:80]
+
+        # Pattern 3: fallback — try to get anything useful
+        else:
+            attrs = [a for a in dir(entry) if not a.startswith("_")]
+            logger.debug(f"_extract_step_info: unknown entry type, attrs={attrs}")
+            thought = str(entry)[:200]
+
+        # Extract URL from state
+        if hasattr(entry, "state") and entry.state:
+            st = entry.state
+            url = getattr(st, "url", "") or ""
+        elif isinstance(entry, dict):
+            url = entry.get("state", {}).get("url", "") if isinstance(entry.get("state"), dict) else ""
+
+    except Exception as exc:
+        logger.warning(f"_extract_step_info: extraction error: {exc}")
+        logger.debug(traceback.format_exc())
+        # Still return something so we emit an event
+        thought = f"(extraction error: {exc})"
 
     return {
-        "step_number": step_number,
-        "thought": thought,
-        "action": action,
+        "step_number": step_index + 1,
+        "thought": thought or "(no thought extracted)",
+        "action": action or "(no action extracted)",
         "action_details": action_details,
         "url": url,
     }
+
+
+def _get_history_length(agent) -> int:
+    """Safely get the length of agent history."""
+    history = getattr(agent, "history", None)
+    if history is None:
+        return 0
+    try:
+        return len(history)
+    except Exception:
+        return 0
 
 
 # ---------------------------------------------------------------------------
@@ -165,6 +199,9 @@ async def run_agent(job: "Job", job_manager: "JobManager") -> None:
             max_completion_tokens=8192,
         )
 
+        logger.info(f"[job:{job.id[:8]}] Creating agent with task ({len(job.task)} chars)")
+        logger.debug(f"[job:{job.id[:8]}] Task preview: {job.task[:200]}...")
+
         agent = Agent(
             task=job.task,
             llm=llm,
@@ -176,28 +213,31 @@ async def run_agent(job: "Job", job_manager: "JobManager") -> None:
 
         # 4. Run agent in background and poll steps
         agent_task = asyncio.create_task(agent.run())
+        logger.info(f"[job:{job.id[:8]}] Agent task created, entering poll loop")
 
-        last_step = 0
+        last_hist_len = 0
+        last_step_emitted = 0
+
         while not agent_task.done():
             await asyncio.sleep(0.5)
 
-            # Poll current step count via agent.state.n_steps
-            current_step = 0
-            try:
-                current_step = getattr(agent.state, "n_steps", 0) or 0
-            except Exception:
-                pass
+            # Poll history length — this is the reliable way to detect steps
+            current_hist_len = _get_history_length(agent)
 
-            if current_step > last_step:
-                # New step(s) detected – extract info
-                for _ in range(last_step, current_step):
-                    info = _extract_step_info(agent)
+            if current_hist_len > last_hist_len:
+                logger.info(f"[job:{job.id[:8]}] History grew: {last_hist_len} → {current_hist_len}")
+
+                # Process each new history entry
+                for idx in range(last_hist_len, current_hist_len):
+                    info = _extract_step_info(agent, idx)
                     if info:
-                        step_number = info.get("step_number", last_step + 1)
+                        step_number = info.get("step_number", idx + 1)
                         thought = info.get("thought", "")
                         action = info.get("action", "")
                         action_details = info.get("action_details", {})
                         url = info.get("url", "")
+
+                        last_step_emitted = step_number
 
                         # Persist to SQLite
                         job_manager.save_step(
@@ -214,11 +254,52 @@ async def run_agent(job: "Job", job_manager: "JobManager") -> None:
                             "action_details": action_details,
                             "url": url,
                         })
+                        logger.info(f"[job:{job.id[:8]}] Published step {step_number}: {action[:60]}")
+                    else:
+                        # Even if extraction fails, emit a minimal step event
+                        last_step_emitted = idx + 1
+                        job_manager.save_step(
+                            job.id, idx + 1, "(extraction failed)", "unknown", {}, ""
+                        )
+                        await job.publish_event({
+                            "type": "step",
+                            "step_number": idx + 1,
+                            "timestamp": datetime.utcnow().isoformat() + "Z",
+                            "thought": "",
+                            "action": "unknown",
+                            "action_details": {},
+                            "url": "",
+                        })
 
-                last_step = current_step
+                last_hist_len = current_hist_len
 
-        # 5. Agent finished
+        # 5. Agent finished — process any remaining history entries
+        final_hist_len = _get_history_length(agent)
+        if final_hist_len > last_hist_len:
+            logger.info(f"[job:{job.id[:8]}] Processing {final_hist_len - last_hist_len} final history entries")
+            for idx in range(last_hist_len, final_hist_len):
+                info = _extract_step_info(agent, idx)
+                if info:
+                    step_number = info.get("step_number", idx + 1)
+                    job_manager.save_step(
+                        job.id, step_number,
+                        info.get("thought", ""),
+                        info.get("action", ""),
+                        info.get("action_details", {}),
+                        info.get("url", ""),
+                    )
+                    await job.publish_event({
+                        "type": "step",
+                        "step_number": step_number,
+                        "timestamp": datetime.utcnow().isoformat() + "Z",
+                        "thought": info.get("thought", ""),
+                        "action": info.get("action", ""),
+                        "action_details": info.get("action_details", {}),
+                        "url": info.get("url", ""),
+                    })
+
         result = await agent_task
+        logger.info(f"[job:{job.id[:8]}] Agent finished with result: {str(result)[:200] if result else 'None'}")
         job_manager.set_result(job.id, str(result) if result else None)
         job_manager.update_status(job.id, "done")
 
@@ -226,7 +307,7 @@ async def run_agent(job: "Job", job_manager: "JobManager") -> None:
             "type": "done",
             "success": True,
             "result": job.result,
-            "total_steps": job.total_steps,
+            "total_steps": last_step_emitted,
             "timestamp": datetime.utcnow().isoformat() + "Z",
         })
 
