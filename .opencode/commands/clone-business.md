@@ -9,6 +9,11 @@ You are in the repo root folder. The task is to create a new static HTML demo cl
 
 **Target URL:** `$1`
 
+## 0. Abort if SPA
+Before doing any work, inspect the target page source (fetch the raw HTML). If the site is a **Single Page Application** — i.e., it uses React, Vue, Angular, or any client-side framework where the initial HTML is a nearly empty `<div id="root"></div>` or `<div id="app"></div>` and all content is rendered by JavaScript — **abort immediately**. Do not proceed. Report that the target is an SPA and cannot be cloned into a static demo.
+
+If it is a normal server-rendered/static HTML page, continue.
+
 First, determine a short slug for the business from the URL (e.g., `ramirezvazquez.com`). Create the directory `demos/<business-slug>/` and build the entire clone there using only HTML, CSS, and vanilla JavaScript.
 
 ## 1. Clone the Website
@@ -93,9 +98,31 @@ Write the complete source code for the cloned site into `demos/<business-slug>/`
 
 Verify the files are created in the correct directory before finishing.
 
-## 9. Commit and Push
+## 9. Write README.md
+Create a file `demos/<business-slug>/README.md` containing **all** site-specific data you extracted from the original website. Be extremely verbose — include every detail you found:
+
+- **Business name** (exact spelling).
+- **Full business description / tagline / mission statement** (copy all text verbatim if possible).
+- **Contact info:**
+  - Email addresses found.
+  - Phone number used in the clone (`+52 5529196649`) and note that it replaced the original.
+  - WhatsApp link (`https://wa.me/525529196649`).
+  - Physical address if listed.
+- **People:** Any names of founders, agents, team members, or authors mentioned.
+- **Services / Products:** Full list with descriptions.
+- **Properties / Portfolio items:** List every item by name with any details (price, location, size, description).
+- **Social media links:** Facebook, Instagram, X/Twitter, YouTube, LinkedIn, TikTok, etc.
+- **External links:** Any other domains or pages referenced.
+- **Sections / Pages:** List every section you cloned (Hero, About, Services, Properties, Contact, etc.).
+- **Brand colors / fonts:** Note any colors, typography, or visual style cues you replicated.
+- **Images / Assets:** List downloaded assets and their filenames in `assets/`.
+- **Notes:** Any quirks, dynamic content you had to mock, or deviations from the original.
+
+Write this README in **Spanish** if the original site is Spanish, otherwise in **English**.
+
+## 10. Commit and Push
 After verifying everything is correct, commit the new demo site to the repo and push it:
-- Stage all files under `demos/<business-slug>/`.
+- Stage all files under `demos/<business-slug>/` (including the README).
 - Write a concise commit message following the repo style (e.g., `feat(demo): add <business-name> bot-ready clone`).
 - Push to `origin/main` (or the current upstream branch).
 - Return the commit hash and the pushed branch name.
