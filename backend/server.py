@@ -6,7 +6,8 @@ from contextlib import asynccontextmanager
 from starlette.applications import Starlette
 from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
-from starlette.routing import Route, WebSocketRoute
+from starlette.routing import Route, WebSocketRoute, Mount
+from starlette.staticfiles import StaticFiles
 
 from backend.config import API_HOST, API_PORT, DB_PATH, HARDCODED_MODEL, TASK_TEMPLATES
 from backend.db import init_db
@@ -19,19 +20,21 @@ from backend.events import events_endpoint
 _job_manager: JobManager | None = None
 
 
-def _build_prompt(task_type: str, context: str | None) -> str:
+def _build_prompt(task_type: str, url: str, context: str | None) -> str:
     """Build agent prompt from hardcoded template + optional business context."""
     template = TASK_TEMPLATES.get(task_type, TASK_TEMPLATES["everything"])
     name = "Marco Antonio Herrera"
     email = "pflores.fisi22@gmail.com"
     phone = "+52 1 55 2567 5419"
     ctx = context or "No additional context provided."
-    return template.format(
+    prompt = template.format(
         context=ctx,
         name=name,
         email=email,
         phone=phone,
     )
+    # Force the agent to navigate to the exact URL first — do NOT search on Google
+    return f"Navigate to this URL first: {url}\n\nOnce the page loads, follow these instructions:\n\n{prompt}"
 
 
 @asynccontextmanager
@@ -59,7 +62,7 @@ async def run_endpoint(request):
         )
 
     # Build prompt from hardcoded template + context
-    prompt = _build_prompt(req.task_type, req.context)
+    prompt = _build_prompt(req.task_type, req.url, req.context)
 
     job = Job(
         id=__import__("uuid").uuid4().hex,
@@ -107,6 +110,8 @@ routes = [
     Route("/api/v1/status/{job_id}", status_endpoint, methods=["GET"]),
     Route("/mjpeg/v1/watch/{job_id}", mjpeg_endpoint, methods=["GET"]),
     WebSocketRoute("/ws/v1/events/{job_id}", events_endpoint),
+    # Serve built React SPA; html=True handles SPA routing (fallback to index.html)
+    Mount("/", app=StaticFiles(directory="admin-dashboard/dist", html=True), name="static"),
 ]
 
 app = Starlette(

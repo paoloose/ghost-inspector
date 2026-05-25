@@ -138,7 +138,8 @@ Provide a structured summary with:
 5. Channel-specific scores: Forms (/10), WhatsApp (/10), Phone (/10), Trust (/10), Mobile (/10), Listings (/10)`,
 }
 
-const BACKEND_URL = 'http://localhost:8001'
+// API base is same-origin (backend serves static + API on same host/port)
+// In dev, Vite proxy forwards to localhost:8001
 
 function StepIndicator({ current, total, onStepClick }) {
   return (
@@ -390,9 +391,14 @@ function RunningView({ job, onReset }) {
   const wsRef = useRef(null)
   const logRef = useRef(null)
 
+  // Build WebSocket URL from current page origin so it works behind any proxy
+  const wsUrl = job?.id
+    ? `${window.location.protocol === 'https:' ? 'wss' : 'ws'}://${window.location.host}/ws/v1/events/${job.id}`
+    : null
+
   useEffect(() => {
-    if (!job?.events_ws_url) return
-    const ws = new WebSocket(job.events_ws_url)
+    if (!wsUrl) return
+    const ws = new WebSocket(wsUrl)
     wsRef.current = ws
     ws.onopen = () => setConnected(true)
     ws.onmessage = (e) => {
@@ -403,7 +409,7 @@ function RunningView({ job, onReset }) {
     ws.onclose = () => setConnected(false)
     ws.onerror = () => setConnected(false)
     return () => ws.close()
-  }, [job?.events_ws_url])
+  }, [wsUrl])
 
   useEffect(() => {
     if (logRef.current) logRef.current.scrollTop = logRef.current.scrollHeight
@@ -439,8 +445,8 @@ function RunningView({ job, onReset }) {
               <span className="text-[10px] text-ink-3 font-mono">MJPEG</span>
             </div>
             <div className="relative aspect-video bg-black flex items-center justify-center">
-              {job?.mjpeg_url ? (
-                <img src={job.mjpeg_url} alt="Live browser" className="w-full h-full object-contain" onError={e => { e.target.style.display = 'none' }} />
+              {job?.id ? (
+                <img src={`/mjpeg/v1/watch/${job.id}`} alt="Live browser" className="w-full h-full object-contain" onError={e => { e.target.style.display = 'none' }} />
               ) : (
                 <p className="text-[13px] text-ink-3">Esperando stream...</p>
               )}
@@ -534,7 +540,7 @@ export default function Audits({ preselectedBusiness, onNavigate }) {
   const handleRun = async () => {
     setLoading(true); setError(null)
     try {
-      const res = await fetch(`${BACKEND_URL}/api/v1/run`, {
+      const res = await fetch('/api/v1/run', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -579,7 +585,7 @@ export default function Audits({ preselectedBusiness, onNavigate }) {
         <div className="mb-5 bg-red-500/10 border border-red-500/20 rounded-xl p-4">
           <p className="text-[13px] text-red-400 font-semibold">Error al iniciar auditoría</p>
           <p className="text-[12px] text-ink-2 mt-1">{error}</p>
-          <p className="text-[11px] text-ink-3 mt-2">Asegúrate de que el backend esté corriendo en {BACKEND_URL}</p>
+          <p className="text-[11px] text-ink-3 mt-2">Asegúrate de que el backend esté corriendo</p>
         </div>
       )}
 
