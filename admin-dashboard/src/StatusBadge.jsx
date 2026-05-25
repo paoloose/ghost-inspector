@@ -34,7 +34,7 @@ export default function StatusBadge({ status }) {
   return (
     <Tooltip content={config.tooltip} position="right">
       <span
-        className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[12px] font-semibold cursor-help transition-transform hover:scale-[1.02]"
+        className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[13px] font-semibold cursor-help transition-transform hover:scale-[1.02]"
         style={{ background: config.bg, color: config.color, border: `1px solid ${config.color}30` }}
       >
         <span className="w-2 h-2 rounded-full animate-pulse" style={{ background: config.color }} />

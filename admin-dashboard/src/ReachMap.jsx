@@ -62,7 +62,7 @@ function HeatBlob({ center, score, name }) {
           direction="top"
           offset={[0, -10]}
           opacity={1}
-          className="bg-bg-card border border-line text-ink text-[12px] px-2 py-1 rounded-lg shadow-glow"
+          className="bg-bg-card border border-line text-ink text-[14px] px-2 py-1 rounded-lg shadow-glow"
         >
           <div className="font-semibold">{name}</div>
           {score !== null && <div className="tabular-nums">Score: {score.toFixed(1)}</div>}
@@ -90,8 +90,9 @@ export default function ReachMap({ onSelectBusiness }) {
   }, [])
 
   return (
-    <div className="w-full h-[420px] rounded-2xl overflow-hidden border border-line relative bg-bg-elev">
+    <div id="reach-map" className="w-full h-[420px] rounded-2xl overflow-hidden border border-line relative bg-bg-elev" style={{ zIndex: 1 }}>
       <style>{`
+        #reach-map .leaflet-pane { z-index: 1 !important; }
         .leaflet-container {
           background: #0a0c14 !important;
           font-family: inherit;
@@ -148,32 +149,32 @@ export default function ReachMap({ onSelectBusiness }) {
       </MapContainer>
 
       {/* Legend overlay */}
-      <div className="absolute bottom-4 left-4 bg-bg-card/90 backdrop-blur-sm border border-line rounded-xl px-4 py-3 shadow-lg">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-ink-3 mb-2">Alcance Ghost Shopper</p>
+      <div className="absolute bottom-4 left-4 bg-bg-card/90 backdrop-blur-sm border border-line rounded-xl px-5 py-4 shadow-lg">
+        <p className="text-[12px] font-semibold uppercase tracking-[0.12em] text-ink-3 mb-2">Alcance Ghost Shopper</p>
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-1.5">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/60" />
-            <span className="text-[11px] text-ink-2">Fuerte (≥7)</span>
+            <span className="text-[12px] text-ink-2">Fuerte (≥7)</span>
           </div>
           <div className="flex items-center gap-1.5">
             <span className="w-2.5 h-2.5 rounded-full bg-amber-500/60" />
-            <span className="text-[11px] text-ink-2">Media (5-7)</span>
+            <span className="text-[12px] text-ink-2">Media (5-7)</span>
           </div>
           <div className="flex items-center gap-1.5">
             <span className="w-2.5 h-2.5 rounded-full bg-red-500/60" />
-            <span className="text-[11px] text-ink-2">Baja (&lt;5)</span>
+            <span className="text-[12px] text-ink-2">Baja (&lt;5)</span>
           </div>
           <div className="flex items-center gap-1.5">
             <span className="w-2.5 h-2.5 rounded-full bg-slate-500/60" />
-            <span className="text-[11px] text-ink-2">Sin audit</span>
+            <span className="text-[12px] text-ink-2">Sin audit</span>
           </div>
         </div>
       </div>
 
       {/* Header overlay */}
       <div className="absolute top-4 left-4 bg-bg-card/90 backdrop-blur-sm border border-line rounded-xl px-4 py-2.5 shadow-lg">
-        <p className="text-[12px] font-semibold text-ink">México — Alcance del sur</p>
-        <p className="text-[11px] text-ink-3">{mappedBusinesses.length} agencias monitoreadas</p>
+        <p className="text-[13px] font-semibold text-ink">México — Alcance del sur</p>
+        <p className="text-[12px] text-ink-3">{mappedBusinesses.length} agencias monitoreadas</p>
       </div>
     </div>
   )

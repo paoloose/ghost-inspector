@@ -3,7 +3,7 @@ import { Card, CardHead } from './ui'
 import { contacts, businesses as businessList } from './data'
 
 function Sparkline({ data, color = '#5b3df5', fill = true, width = 120, height = 32 }) {
-  if (!data || data.length < 2) return <div className="text-[11px] text-ink-3">—</div>
+  if (!data || data.length < 2) return <div className="text-[14px] text-ink-3">—</div>
   const min = Math.min(...data)
   const max = Math.max(...data)
   const range = max - min || 1
@@ -50,10 +50,10 @@ function ScoreMeter({ score, label, size = 56 }) {
           />
         </svg>
         <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-[13px] font-bold text-ink tabular-nums">{score.toFixed(1)}</span>
+          <span className="text-[14px] font-bold text-ink tabular-nums">{score.toFixed(1)}</span>
         </div>
       </div>
-      <span className="text-[10px] text-ink-3 mt-1.5 uppercase tracking-wide">{label}</span>
+      <span className="text-[14px] text-ink-3 mt-1.5 uppercase tracking-wide">{label}</span>
     </div>
   )
 }
@@ -84,9 +84,9 @@ function StatCard({ title, value, sub, sparklineData, barData, score, color = '#
     <Card padding="p-5">
       <div className="flex items-start justify-between mb-3">
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-ink-3 mb-1">{title}</p>
-          <p className="text-[24px] font-bold text-ink tabular-nums tracking-tight">{value}</p>
-          {sub && <p className="text-[12px] text-ink-3 mt-0.5">{sub}</p>}
+          <p className="text-[12px] font-semibold uppercase tracking-[0.12em] text-ink-3 mb-1">{title}</p>
+          <p className="text-[22px] font-bold text-ink tabular-nums tracking-tight">{value}</p>
+          {sub && <p className="text-[14px] text-ink-3 mt-0.5">{sub}</p>}
         </div>
         {score !== undefined && <ScoreMeter score={score} label="Score" />}
       </div>
@@ -118,21 +118,21 @@ function EmailThread({ contact, selected, onSelect }) {
       }`}
     >
       <div className="flex items-start gap-3">
-        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-brand/30 to-brand/10 border border-brand/20 flex items-center justify-center text-brand-light font-bold text-[13px] shrink-0">
+        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-brand/30 to-brand/10 border border-brand/20 flex items-center justify-center text-brand-light font-bold text-[14px] shrink-0">
           {contact.name.split(' ').map(w => w[0]).join('')}
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between">
             <p className="text-[14px] font-semibold text-ink">{contact.name}</p>
-            <span className="text-[11px] text-ink-3 tabular-nums">{last.date}</span>
+            <span className="text-[14px] text-ink-3 tabular-nums">{last.date}</span>
           </div>
-          <p className="text-[12px] text-ink-3 truncate">{business?.name}</p>
+          <p className="text-[13px] text-ink-3 truncate">{business?.name}</p>
           <p className="text-[13px] text-ink-2 mt-1.5 truncate">{last.subject}</p>
           <div className="flex items-center gap-2 mt-2">
-            <span className={`text-[10px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded ${last.status === 'responded' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-amber-500/10 text-amber-400'}`}>
+            <span className={`text-[12px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded ${last.status === 'responded' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-amber-500/10 text-amber-400'}`}>
               {last.status}
             </span>
-            <span className="text-[11px] text-ink-3">{contact.emails.length} emails</span>
+            <span className="text-[13px] text-ink-3">{contact.emails.length} emails</span>
           </div>
         </div>
       </div>
@@ -148,21 +148,21 @@ function EmailDetail({ contact }) {
       <div className="border-b border-line p-5">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-brand/30 to-brand/10 border border-brand/20 flex items-center justify-center text-brand-light font-bold text-[13px]">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-brand/30 to-brand/10 border border-brand/20 flex items-center justify-center text-brand-light font-bold text-[14px]">
               {contact.name.split(' ').map(w => w[0]).join('')}
             </div>
             <div>
               <p className="text-[14px] font-semibold text-ink">{contact.name}</p>
-              <p className="text-[12px] text-ink-3">{business?.name} · {contact.email}</p>
+              <p className="text-[13px] text-ink-3">{business?.name} · {contact.email}</p>
             </div>
           </div>
-          <span className={`text-[11px] font-semibold uppercase tracking-wide px-2.5 py-1 rounded ${contact.score >= 7 ? 'bg-emerald-500/10 text-emerald-400' : contact.score >= 5 ? 'bg-amber-500/10 text-amber-400' : 'bg-red-500/10 text-red-400'}`}>
+          <span className={`text-[12px] font-semibold uppercase tracking-wide px-2.5 py-1 rounded ${contact.score >= 7 ? 'bg-emerald-500/10 text-emerald-400' : contact.score >= 5 ? 'bg-amber-500/10 text-amber-400' : 'bg-red-500/10 text-red-400'}`}>
             Score: {contact.score}
           </span>
         </div>
 
         {/* Contact Score Breakdown */}
-        <div className="flex items-center gap-6 mt-3 pt-3 border-t border-line">
+        <div className="flex items-center gap-4 mt-3 pt-3 border-t border-line">
           <ScoreMeter score={contact.responseTime} label="Response" size={48} />
           <ScoreMeter score={contact.personalization} label="Personal" size={48} />
           <ScoreMeter score={contact.clarity} label="Clarity" size={48} />
@@ -175,16 +175,16 @@ function EmailDetail({ contact }) {
           <div key={idx} className={`flex ${email.direction === 'sent' ? 'justify-end' : 'justify-start'}`}>
             <div className={`max-w-[85%] p-4 rounded-2xl ${email.direction === 'sent' ? 'bg-brand/10 border border-brand/20 rounded-br-sm' : 'bg-bg-elev border border-line rounded-bl-sm'}`}>
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[11px] font-semibold text-ink-2 uppercase tracking-wide">{email.direction}</span>
-                <span className="text-[11px] text-ink-3 tabular-nums">{email.date}</span>
+                <span className="text-[12px] font-semibold text-ink-2 uppercase tracking-wide">{email.direction}</span>
+                <span className="text-[12px] text-ink-3 tabular-nums">{email.date}</span>
               </div>
-              <p className="text-[13px] font-semibold text-ink mb-2">{email.subject}</p>
-              <p className="text-[13px] text-ink-2 leading-relaxed whitespace-pre-wrap">{email.body}</p>
+              <p className="text-[14px] font-semibold text-ink mb-2">{email.subject}</p>
+              <p className="text-[14px] text-ink-2 leading-relaxed whitespace-pre-wrap">{email.body}</p>
               {email.aiScore !== undefined && (
                 <div className="mt-3 pt-3 border-t border-line/50">
                   <div className="flex items-center justify-between">
-                    <span className="text-[11px] text-ink-3">AI Score</span>
-                    <span className="text-[13px] font-bold text-brand-light">{email.aiScore}/10</span>
+                    <span className="text-[12px] text-ink-3">AI Score</span>
+                    <span className="text-[12px] font-bold text-brand-light">{email.aiScore}/10</span>
                   </div>
                   <div className="w-full h-1.5 bg-bg-elev rounded-full mt-1.5 overflow-hidden">
                     <div className="h-full bg-brand rounded-full" style={{ width: `${(email.aiScore / 10) * 100}%` }} />
@@ -214,19 +214,19 @@ export default function Contacts() {
   const avgScore = (contacts.reduce((s, c) => s + c.score, 0) / contacts.length).toFixed(1)
 
   return (
-    <div className="px-8 py-8 max-w-[1400px] mx-auto">
+    <div className="px-9 py-9 max-w-[1400px] mx-auto">
       <div className="flex items-center justify-between mb-2">
         <div>
           <h1 className="text-[22px] font-bold tracking-[-0.02em] text-gradient">Contacts</h1>
-          <p className="text-[13px] text-ink-3 mt-0.5">Ghost Shopper — Evaluación de respuestas por email</p>
+          <p className="text-[14px] text-ink-3 mt-0.5">Ghost Shopper — Evaluación de respuestas por email</p>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-[12px] text-ink-3">{contacts.length} negocios evaluados</span>
+          <span className="text-[13px] text-ink-3">{contacts.length} negocios evaluados</span>
         </div>
       </div>
 
       {/* Stats Row */}
-      <div className="grid grid-cols-4 gap-4 mb-6 mt-5">
+      <div className="grid grid-cols-4 gap-6 mb-7 mt-5">
         <StatCard
           title="Avg Response Time"
           value={`${avgResponse}h`}
@@ -262,8 +262,8 @@ export default function Contacts() {
 
       {/* Email Threads */}
       <div className="grid grid-cols-5 gap-5">
-        <div className="col-span-2 space-y-3">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-ink-3 mb-2">Conversaciones</p>
+        <div className="col-span-2 space-y-6">
+          <p className="text-[14px] font-semibold uppercase tracking-[0.12em] text-ink-3 mb-2">Conversaciones</p>
           {contacts.map(c => (
             <EmailThread key={c.id} contact={c} selected={selected} onSelect={setSelected} />
           ))}

@@ -7,6 +7,7 @@ import base64
 import io
 import json
 import logging
+import re
 import traceback
 from datetime import datetime
 from typing import TYPE_CHECKING
@@ -89,20 +90,64 @@ async def start_screencast(browser_session, job: "Job") -> None:
 # Step extraction from agent history
 # ---------------------------------------------------------------------------
 
+def _deep_dump(obj) -> dict | list | str | None:
+    """Deep serialize any object to a JSON-friendly structure."""
+    if obj is None:
+        return None
+    if isinstance(obj, (str, int, float, bool)):
+        return obj
+    if isinstance(obj, list):
+        return [_deep_dump(x) for x in obj]
+    if isinstance(obj, dict):
+        return {k: _deep_dump(v) for k, v in obj.items()}
+    # Pydantic v2: try JSON dump first (handles nested objects more reliably)
+    if hasattr(obj, "model_dump_json"):
+        try:
+            return _deep_dump(json.loads(obj.model_dump_json()))
+        except Exception:
+            pass
+    if hasattr(obj, "model_dump"):
+        try:
+            return _deep_dump(obj.model_dump())
+        except Exception:
+            pass
+    if hasattr(obj, "dict"):
+        try:
+            return _deep_dump(obj.dict())
+        except Exception:
+            pass
+    try:
+        return {k: _deep_dump(v) for k, v in vars(obj).items() if not k.startswith("_")}
+    except Exception:
+        pass
+    return str(obj)
+
+
+def _get_nested(data: dict, path: str):
+    """Safely get a dotted-path value from a dict."""
+    val = data
+    for key in path.split("."):
+        if isinstance(val, dict):
+            val = val.get(key)
+        else:
+            return None
+    return val
+
+
 def _extract_step_info(agent, step_index: int) -> dict | None:
-    """Extract step info from agent history at the given index."""
+    """Extract step info from agent history at the given index.
+
+    Uses the documented browser-use helper methods first (action_names,
+    model_thoughts, urls), then falls back to deep-serializing the entry.
+    """
     history = getattr(agent, "history", None)
     if not history:
-        logger.debug("_extract_step_info: no history attribute")
         return None
 
     try:
-        hist_len = len(history)
-        if hist_len == 0 or step_index >= hist_len:
+        if step_index >= len(history):
             return None
-        entry = history[step_index]
-    except Exception as exc:
-        logger.debug(f"_extract_step_info: history access error: {exc}")
+    except Exception:
         return None
 
     thought = ""
@@ -110,58 +155,219 @@ def _extract_step_info(agent, step_index: int) -> dict | None:
     action_details: dict = {}
     url = ""
 
-    # Try multiple access patterns for browser_use's AgentHistory object
+    # ------------------------------------------------------------------
+    # 1) Try documented AgentHistoryList helper methods (most reliable)
+    # ------------------------------------------------------------------
+    if hasattr(history, "action_names"):
+        try:
+            names = history.action_names()
+            if step_index < len(names) and names[step_index]:
+                action = str(names[step_index])
+                logger.info(f"_extract_step_info [{step_index}] action from history.action_names()={action!r}")
+        except Exception as exc:
+            logger.debug(f"action_names() failed: {exc}")
+
+    if hasattr(history, "model_thoughts"):
+        try:
+            thoughts = history.model_thoughts()
+            if step_index < len(thoughts) and thoughts[step_index] is not None:
+                # model_thoughts() returns AgentBrain objects — stringify them
+                t = thoughts[step_index]
+                if hasattr(t, "evaluation_previous_goal"):
+                    thought = (
+                        getattr(t, "evaluation_previous_goal", "") or
+                        getattr(t, "memory", "") or
+                        getattr(t, "thought", "") or
+                        getattr(t, "reasoning", "") or
+                        getattr(t, "next_goal", "") or
+                        str(t)
+                    )
+                else:
+                    thought = str(t)
+                logger.info(f"_extract_step_info [{step_index}] thought from history.model_thoughts()={thought[:60]!r}")
+        except Exception as exc:
+            logger.debug(f"model_thoughts() failed: {exc}")
+
+    if hasattr(history, "urls"):
+        try:
+            urls = history.urls()
+            if step_index < len(urls) and urls[step_index]:
+                url = str(urls[step_index])
+        except Exception as exc:
+            logger.debug(f"urls() failed: {exc}")
+
+    if hasattr(history, "action_results"):
+        try:
+            results = history.action_results()
+            if step_index < len(results) and results[step_index] is not None:
+                r = results[step_index]
+                dumped = _deep_dump(r)
+                if isinstance(dumped, dict):
+                    action_details = dumped
+        except Exception as exc:
+            logger.debug(f"action_results() failed: {exc}")
+
+    # If helpers gave us everything, return early
+    if action and thought:
+        return {
+            "step_number": step_index + 1,
+            "thought": thought,
+            "action": action,
+            "action_details": action_details,
+            "url": url,
+        }
+
+    # ------------------------------------------------------------------
+    # 2) Fallback: deep-serialize the individual entry and walk the dict
+    # ------------------------------------------------------------------
     try:
-        # Pattern 1: model_output.current_state (browser_use >= 0.12)
-        if hasattr(entry, "model_output") and entry.model_output:
-            mo = entry.model_output
-            if hasattr(mo, "current_state") and mo.current_state:
-                cs = mo.current_state
-                thought = getattr(cs, "evaluation_previous_goal", "") or getattr(cs, "memory", "") or ""
-            if hasattr(mo, "action") and mo.action:
-                acts = mo.action
-                if acts and len(acts) > 0:
-                    first = acts[0]
-                    if hasattr(first, "model_dump"):
-                        action_details = first.model_dump()
-                    elif isinstance(first, dict):
+        entry = history[step_index]
+        d = _deep_dump(entry)
+
+        if isinstance(d, dict):
+            # Log the FULL raw structure for first 2 steps so we can inspect it
+            if step_index < 2:
+                logger.info(f"_extract_step_info [{step_index}] FULL DUMP:\n{json.dumps(d, default=str, indent=2)[:2000]}")
+
+            # -- Thought --
+            for path in [
+                "model_output.current_state.evaluation_previous_goal",
+                "model_output.current_state.memory",
+                "model_output.current_state.thought",
+                "model_output.current_state.reasoning",
+                "model_output.current_state.next_goal",
+                "model_output.text",
+                "model_output.thought",
+                "model_output.content",
+                "result.extracted_content",
+                "result.text",
+                "thought",
+                "memory",
+            ]:
+                val = _get_nested(d, path)
+                if val and isinstance(val, str) and val.strip():
+                    thought = val.strip()
+                    logger.info(f"  thought found at {path}={thought[:60]!r}")
+                    break
+
+            # -- Action --
+            mo_action = _get_nested(d, "model_output.action")
+            if mo_action is not None:
+                if isinstance(mo_action, list) and len(mo_action) > 0:
+                    first = mo_action[0]
+                    if isinstance(first, dict):
                         action_details = first
-                    else:
-                        action_details = {"raw": str(first)}
-                    action = action_details.get("type", str(action_details)[:80])
+                        action = first.get("type", "")
+                        if not action:
+                            parts = [f"{k}={str(v)[:30]}" for k, v in first.items()
+                                     if k not in ("type", "model_config") and v is not None]
+                            action = f"action({', '.join(parts[:2])})" if parts else "action"
+                        logger.info(f"  action from model_output.action[0].type={action!r}")
+                elif isinstance(mo_action, dict):
+                    action_details = mo_action
+                    action = mo_action.get("type", "")
+                    logger.info(f"  action from model_output.action.type={action!r}")
 
-        # Pattern 2: direct dict access
-        elif isinstance(entry, dict):
-            thought = entry.get("thought", "") or entry.get("memory", "")
-            action_details = entry.get("action", {})
-            action = action_details.get("type", str(action_details)[:80]) if isinstance(action_details, dict) else str(action_details)[:80]
+            if not action:
+                # Search recursively for any "type" key
+                def _find_type(obj, depth=0):
+                    if depth > 5:
+                        return ""
+                    if isinstance(obj, dict):
+                        if "type" in obj and isinstance(obj["type"], str) and obj["type"]:
+                            return obj["type"]
+                        for v in obj.values():
+                            t = _find_type(v, depth + 1)
+                            if t:
+                                return t
+                    elif isinstance(obj, list):
+                        for item in obj:
+                            t = _find_type(item, depth + 1)
+                            if t:
+                                return t
+                    return ""
+                action = _find_type(d)
+                if action:
+                    logger.info(f"  action found by recursive search={action!r}")
 
-        # Pattern 3: fallback — try to get anything useful
+            # -- URL --
+            for path in ["state.url", "state.page.url", "url"]:
+                val = _get_nested(d, path)
+                if val and isinstance(val, str):
+                    url = val
+                    break
+
         else:
-            attrs = [a for a in dir(entry) if not a.startswith("_")]
-            logger.debug(f"_extract_step_info: unknown entry type, attrs={attrs}")
-            thought = str(entry)[:200]
-
-        # Extract URL from state
-        if hasattr(entry, "state") and entry.state:
-            st = entry.state
-            url = getattr(st, "url", "") or ""
-        elif isinstance(entry, dict):
-            url = entry.get("state", {}).get("url", "") if isinstance(entry.get("state"), dict) else ""
+            logger.warning(f"_extract_step_info [{step_index}] entry is not a dict after dump: {type(d).__name__}")
 
     except Exception as exc:
-        logger.warning(f"_extract_step_info: extraction error: {exc}")
-        logger.debug(traceback.format_exc())
-        # Still return something so we emit an event
-        thought = f"(extraction error: {exc})"
+        logger.warning(f"_extract_step_info [{step_index}] deep-serialize failed: {exc}")
 
-    return {
+    # ------------------------------------------------------------------
+    # 3) Final fallback: repr() regex
+    # ------------------------------------------------------------------
+    if not thought or not action:
+        try:
+            rep = repr(history[step_index])
+            if not thought:
+                m = re.search(r"evaluation_previous_goal='([^']{5,500})'", rep)
+                if m:
+                    thought = m.group(1)
+            if not action:
+                m = re.search(r"type='([^']+)'", rep)
+                if m:
+                    action = m.group(1)
+        except Exception:
+            pass
+
+    result = {
         "step_number": step_index + 1,
         "thought": thought or "(no thought extracted)",
-        "action": action or "(no action extracted)",
+        "action": action or "unknown",
         "action_details": action_details,
         "url": url,
     }
+    logger.info(f"_extract_step_info [{step_index}] FINAL -> action={action!r}, thought={thought[:80]!r}, url={url!r}")
+    return result
+
+
+def _scan_for_tool_calls(text: str) -> list[dict]:
+    """Scan agent output text for extracted contact info and return tool_call events."""
+    tool_calls = []
+
+    # General Mexican phone numbers (including raw digits)
+    phone_pattern = r"(\+?52[\s\d\-\(\)\.]{8,18})"
+    seen = set()
+    for match in re.finditer(phone_pattern, text):
+        number = re.sub(r"[\s\(\)\.\-]", "", match.group(1)).strip()
+        if len(number) >= 10 and number not in seen:
+            seen.add(number)
+            tool_calls.append({"tool": "extract_phone", "number": number})
+
+    # WhatsApp numbers — wa.me links or explicit WhatsApp mentions
+    wa_link_pattern = r"wa\.me/(\+?\d{10,15})"
+    wa_text_pattern = r"whatsapp(?:[^\n]{0,40})(\+?52[\s\d\-\(\)\.]{8,18})"
+    for match in re.finditer(wa_link_pattern, text, re.IGNORECASE):
+        number = match.group(1).strip()
+        if number not in seen:
+            seen.add(number)
+            tool_calls.append({"tool": "extract_whatsapp", "number": number})
+    for match in re.finditer(wa_text_pattern, text, re.IGNORECASE):
+        number = re.sub(r"[\s\(\)\.\-]", "", match.group(1)).strip()
+        if number not in seen:
+            seen.add(number)
+            tool_calls.append({"tool": "extract_whatsapp", "number": number})
+
+    # Email patterns
+    email_pattern = r"([\w\.\-]+@[\w\.\-]+\.[a-zA-Z]{2,})"
+    seen_emails = set()
+    for match in re.finditer(email_pattern, text):
+        email = match.group(1).strip()
+        if email not in seen_emails:
+            seen_emails.add(email)
+            tool_calls.append({"tool": "extract_email", "email": email})
+
+    return tool_calls
 
 
 def _get_history_length(agent) -> int:
@@ -180,6 +386,25 @@ def _get_history_length(agent) -> int:
 # ---------------------------------------------------------------------------
 
 
+async def _get_browser_url(browser_session) -> str:
+    """Try to get the current page URL from the browser session."""
+    try:
+        if hasattr(browser_session, "page") and browser_session.page:
+            return getattr(browser_session.page, "url", "") or ""
+        # Try CDP
+        cdp = await browser_session.get_or_create_cdp_session()
+        info = await cdp.cdp_client.send.Runtime.evaluate(
+            params={"expression": "window.location.href", "returnByValue": True},
+            session_id=cdp.session_id,
+        )
+        result = info.get("result", {})
+        if result.get("type") == "string":
+            return result.get("value", "")
+    except Exception as exc:
+        logger.debug(f"_get_browser_url failed: {exc}")
+    return ""
+
+
 async def run_agent(job: "Job", job_manager: "JobManager") -> None:
     """Launch the browser, start screencast, run the agent, and publish events."""
     browser: BrowserSession | None = None
@@ -196,7 +421,7 @@ async def run_agent(job: "Job", job_manager: "JobManager") -> None:
             model=job.model or HARDCODED_MODEL,
             api_key=OPENCODEGO_API_KEY,
             base_url=OPENCODEGO_BASE_URL,
-            max_completion_tokens=8192,
+            max_completion_tokens=4096,
         )
 
         logger.info(f"[job:{job.id[:8]}] Creating agent with task ({len(job.task)} chars)")
@@ -206,10 +431,19 @@ async def run_agent(job: "Job", job_manager: "JobManager") -> None:
             task=job.task,
             llm=llm,
             browser_session=browser,
+            max_steps=15,
+            llm_timeout=60,
+            step_timeout=60,
         )
 
         # 3. Mark running
         job_manager.update_status(job.id, "running")
+        await job.publish_event({
+            "type": "status",
+            "status": "running",
+            "message": "Agente iniciado y navegador listo",
+            "timestamp": datetime.utcnow().isoformat() + "Z",
+        })
 
         # 4. Run agent in background and poll steps
         agent_task = asyncio.create_task(agent.run())
@@ -217,12 +451,32 @@ async def run_agent(job: "Job", job_manager: "JobManager") -> None:
 
         last_hist_len = 0
         last_step_emitted = 0
+        last_known_url = ""
+        last_action = ""
+        url_poll_counter = 0
 
         while not agent_task.done():
             await asyncio.sleep(0.5)
+            url_poll_counter += 1
 
             # Poll history length — this is the reliable way to detect steps
             current_hist_len = _get_history_length(agent)
+
+            # Poll browser URL for url_change events (every 2s to avoid CDP overhead)
+            if url_poll_counter % 4 == 0:
+                try:
+                    current_url = await _get_browser_url(browser)
+                    if current_url and current_url != last_known_url:
+                        logger.info(f"[job:{job.id[:8]}] URL changed: {last_known_url} -> {current_url}")
+                        await job.publish_event({
+                            "type": "url_change",
+                            "url": current_url,
+                            "previous_url": last_known_url,
+                            "timestamp": datetime.utcnow().isoformat() + "Z",
+                        })
+                        last_known_url = current_url
+                except Exception:
+                    pass
 
             if current_hist_len > last_hist_len:
                 logger.info(f"[job:{job.id[:8]}] History grew: {last_hist_len} → {current_hist_len}")
@@ -235,16 +489,17 @@ async def run_agent(job: "Job", job_manager: "JobManager") -> None:
                         thought = info.get("thought", "")
                         action = info.get("action", "")
                         action_details = info.get("action_details", {})
-                        url = info.get("url", "")
+                        url = info.get("url", "") or last_known_url
 
                         last_step_emitted = step_number
+                        last_action = action
 
                         # Persist to SQLite
                         job_manager.save_step(
                             job.id, step_number, thought, action, action_details, url
                         )
 
-                        # Broadcast event
+                        # Broadcast step event
                         await job.publish_event({
                             "type": "step",
                             "step_number": step_number,
@@ -254,12 +509,33 @@ async def run_agent(job: "Job", job_manager: "JobManager") -> None:
                             "action_details": action_details,
                             "url": url,
                         })
-                        logger.info(f"[job:{job.id[:8]}] Published step {step_number}: {action[:60]}")
+                        logger.info(f"[job:{job.id[:8]}] Published step {step_number}: {action[:80]}")
+
+                        # Emit a separate thinking event if thought is substantial
+                        if thought and len(thought) > 10 and not thought.startswith("("):
+                            await job.publish_event({
+                                "type": "thinking",
+                                "step_number": step_number,
+                                "timestamp": datetime.utcnow().isoformat() + "Z",
+                                "thought": thought,
+                            })
+
+                        # Scan for extracted contacts and emit tool_call events
+                        combined_text = f"{thought} {action} {json.dumps(action_details)}"
+                        for tc in _scan_for_tool_calls(combined_text):
+                            await job.publish_event({
+                                "type": "tool_call",
+                                "step_number": step_number,
+                                "timestamp": datetime.utcnow().isoformat() + "Z",
+                                "tool": tc["tool"],
+                                "data": tc,
+                            })
+                            logger.info(f"[job:{job.id[:8]}] Tool call: {tc['tool']} -> {tc}")
                     else:
                         # Even if extraction fails, emit a minimal step event
                         last_step_emitted = idx + 1
                         job_manager.save_step(
-                            job.id, idx + 1, "(extraction failed)", "unknown", {}, ""
+                            job.id, idx + 1, "(extraction failed)", "unknown", {}, last_known_url
                         )
                         await job.publish_event({
                             "type": "step",
@@ -268,10 +544,15 @@ async def run_agent(job: "Job", job_manager: "JobManager") -> None:
                             "thought": "",
                             "action": "unknown",
                             "action_details": {},
-                            "url": "",
+                            "url": last_known_url,
                         })
 
                 last_hist_len = current_hist_len
+
+            # Emit an "executing" event if we're on the same step for a while
+            # This gives the client a sense of ongoing activity
+            if last_action and last_step_emitted > 0:
+                pass  # We could emit periodic status here if needed
 
         # 5. Agent finished — process any remaining history entries
         final_hist_len = _get_history_length(agent)
@@ -286,7 +567,7 @@ async def run_agent(job: "Job", job_manager: "JobManager") -> None:
                         info.get("thought", ""),
                         info.get("action", ""),
                         info.get("action_details", {}),
-                        info.get("url", ""),
+                        info.get("url", "") or last_known_url,
                     )
                     await job.publish_event({
                         "type": "step",
@@ -295,13 +576,43 @@ async def run_agent(job: "Job", job_manager: "JobManager") -> None:
                         "thought": info.get("thought", ""),
                         "action": info.get("action", ""),
                         "action_details": info.get("action_details", {}),
-                        "url": info.get("url", ""),
+                        "url": info.get("url", "") or last_known_url,
                     })
 
-        result = await agent_task
+        try:
+            result = await asyncio.wait_for(agent_task, timeout=180)
+        except asyncio.TimeoutError:
+            logger.warning(f"[job:{job.id[:8]}] Agent run timed out after 180s")
+            agent_task.cancel()
+            try:
+                await agent_task
+            except asyncio.CancelledError:
+                pass
+            result = None
+            job_manager.set_result(job.id, None, "Agent timed out after 180s")
+            job_manager.update_status(job.id, "error")
+            await job.publish_event({
+                "type": "error",
+                "reason": "La auditoría excedió el tiempo máximo (3 min). Intenta con un task type más específico.",
+                "timestamp": datetime.utcnow().isoformat() + "Z",
+            })
+            return
+
         logger.info(f"[job:{job.id[:8]}] Agent finished with result: {str(result)[:200] if result else 'None'}")
         job_manager.set_result(job.id, str(result) if result else None)
         job_manager.update_status(job.id, "done")
+
+        # Emit any final tool_calls from the result text
+        if result:
+            result_text = str(result)
+            for tc in _scan_for_tool_calls(result_text):
+                await job.publish_event({
+                    "type": "tool_call",
+                    "step_number": last_step_emitted,
+                    "timestamp": datetime.utcnow().isoformat() + "Z",
+                    "tool": tc["tool"],
+                    "data": tc,
+                })
 
         await job.publish_event({
             "type": "done",

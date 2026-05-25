@@ -3,6 +3,8 @@ import Sidebar from './Sidebar'
 import Radar from './Radar'
 import Contacts from './Contacts'
 import Audits from './Audits'
+import GhostShopperTour from './GhostShopperTour'
+import AuditsTour from './AuditsTour'
 
 export default function App() {
   const [screen, setScreen] = useState('radar')
@@ -25,23 +27,33 @@ export default function App() {
 
   const screens = {
     radar: (
-      <Radar
-        selectedBusiness={selectedBusiness}
-        onSelectBusiness={(b) => setSelectedBusiness(b)}
-        onNavigate={navigate}
-      />
+      <div id="radar-page">
+        <Radar
+          selectedBusiness={selectedBusiness}
+          onSelectBusiness={(b) => setSelectedBusiness(b)}
+          onNavigate={navigate}
+        />
+      </div>
     ),
-    contacts: <Contacts onNavigate={navigate} />,
+    contacts: (
+      <div id="contacts-page">
+        <Contacts onNavigate={navigate} />
+      </div>
+    ),
     audits: (
-      <Audits
-        preselectedBusiness={preselectedBusiness}
-        onNavigate={navigate}
-      />
+      <div id="audits-page">
+        <Audits
+          preselectedBusiness={preselectedBusiness}
+          onNavigate={navigate}
+        />
+        <AuditsTour />
+      </div>
     ),
   }
 
   return (
     <div className="flex min-h-screen bg-bg text-ink font-sans">
+      <GhostShopperTour />
       <Sidebar active={screen} onNavigate={navigate} />
       <div className="flex-1 flex flex-col min-h-screen">
         {screens[screen]}
