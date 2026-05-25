@@ -30,7 +30,7 @@ async def events_endpoint(websocket: WebSocket):
                     "type": "heartbeat",
                     "timestamp": datetime.utcnow().isoformat() + "Z",
                 })
-            except Exception:
+            except (RuntimeError, Exception):
                 break
 
     heartbeat_task = asyncio.create_task(heartbeat())
@@ -38,8 +38,13 @@ async def events_endpoint(websocket: WebSocket):
     try:
         while True:
             event = await queue.get()
-            await websocket.send_json(event)
+            try:
+                await websocket.send_json(event)
+            except RuntimeError:
+                # Socket already closed (client disconnected or prior close sent)
+                break
             if event.get("type") in ("done", "error"):
+                await websocket.close()
                 break
     except WebSocketDisconnect:
         pass
@@ -49,3 +54,4 @@ async def events_endpoint(websocket: WebSocket):
             await heartbeat_task
         except asyncio.CancelledError:
             pass
+        job.unsubscribe_events(queue)

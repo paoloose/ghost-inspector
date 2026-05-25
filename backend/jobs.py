@@ -58,6 +58,10 @@ class Job:
         self._events_subs.append(q)
         return q
 
+    def unsubscribe_events(self, queue: asyncio.Queue) -> None:
+        if queue in self._events_subs:
+            self._events_subs.remove(queue)
+
     async def publish_event(self, event: dict) -> None:
         for q in self._events_subs:
             try:
