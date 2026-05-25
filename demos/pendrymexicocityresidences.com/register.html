@@ -3,85 +3,104 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Register | Pendry Residences Mexico City</title>
+  <title>Register | Pendry Mexico</title>
   <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&display=swap" rel="stylesheet" />
 </head>
 <body>
-
-  <!-- Loading Overlay -->
-  <div id="loadingOverlay" class="loading-overlay">
-    <div class="spinner"></div>
-    <div class="loading-text" id="loadingText">Cargando...</div>
+  <!-- Global Loading Overlay -->
+  <div id="global-loader" class="global-loader" aria-hidden="true">
+    <div class="loader-spinner"></div>
+    <p class="loader-text">Loading...</p>
   </div>
 
   <!-- Header -->
-  <header class="site-header scrolled" style="background:rgba(10,10,10,0.95);">
-    <div class="container">
-      <a href="index.html" class="logo" data-track="click" data-detail="logo-home">
-        <img src="https://pendrymexicocityresidences.com/wp-content/uploads/2025/11/PRMX-Logo-white-scaled.png" alt="Pendry Residences Mexico City" onerror="this.style.display='none'">
+  <header class="site-header" id="header">
+    <div class="header-inner">
+      <a href="index.html" class="logo">
+        <img src="https://pendrymexicocityresidences.com/wp-content/uploads/2025/11/PRMX-Logo-white-scaled.png" alt="Pendry Residences Mexico City" onerror="this.style.display='none'; this.parentNode.innerHTML='<span class=logo-fallback>PENDRY MEXICO</span>';" />
       </a>
-      <nav class="main-nav">
-        <a href="index.html#the_city">The City</a>
-        <a href="index.html#the_residences">The Residences</a>
-        <a href="index.html#inquiries">Inquire</a>
+      <nav class="main-nav" id="main-nav">
+        <ul>
+          <li><a href="index.html#the_city" class="nav-link">THE CITY</a></li>
+          <li><a href="index.html#the_backdrop" class="nav-link">THE BACKDROP</a></li>
+          <li><a href="index.html#the_residences" class="nav-link">THE RESIDENCES</a></li>
+          <li><a href="index.html#the_offerings" class="nav-link">THE OFFERINGS</a></li>
+          <li><a href="index.html#the_culture" class="nav-link">THE CULTURE</a></li>
+          <li><a href="index.html#the_opportunity" class="nav-link">THE OPPORTUNITY</a></li>
+        </ul>
       </nav>
       <div class="header-actions">
-        <a href="index.html" class="btn">Back to Home</a>
+        <a href="index.html#inquiries" class="btn btn-accent inquire-btn">INQUIRE</a>
+        <button class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Toggle menu">
+          <span></span><span></span><span></span>
+        </button>
       </div>
     </div>
   </header>
 
-  <main style="padding-top:120px; min-height:100vh; display:flex; align-items:center; justify-content:center;">
-    <div class="container" style="max-width:480px;">
-      <div class="text-center" style="margin-bottom:2rem;">
-        <h2 class="section-title" style="font-size:2rem;">Create Account</h2>
-        <p class="section-text">Register to request availability and ownership opportunities.</p>
-      </div>
+  <!-- Mobile Menu -->
+  <div class="mobile-menu" id="mobile-menu">
+    <button class="mobile-menu-close" id="mobile-menu-close" aria-label="Close menu">&times;</button>
+    <ul>
+      <li><a href="index.html#the_city">THE CITY</a></li>
+      <li><a href="index.html#the_backdrop">THE BACKDROP</a></li>
+      <li><a href="index.html#the_residences">THE RESIDENCES</a></li>
+      <li><a href="index.html#the_offerings">THE OFFERINGS</a></li>
+      <li><a href="index.html#the_culture">THE CULTURE</a></li>
+      <li><a href="index.html#the_opportunity">THE OPPORTUNITY</a></li>
+      <li><a href="index.html#inquiries">INQUIRE</a></li>
+    </ul>
+  </div>
 
-      <form id="registerForm" novalidate>
+  <main class="register-page">
+    <div class="register-card">
+      <h1>Crear Cuenta / Register</h1>
+      <p class="register-subtitle">Create your account to access exclusive residence information.</p>
+      <form class="register-form" id="register-form" novalidate>
         <div class="form-group">
-          <label for="regName">Name</label>
-          <input type="text" id="regName" name="name" required data-track="focus" data-detail="register-name-focus">
-          <span class="error-msg">Please enter your name.</span>
+          <input type="text" name="name" placeholder="Full Name" required />
         </div>
         <div class="form-group">
-          <label for="regEmail">Email <span style="color:var(--color-accent)">*</span></label>
-          <input type="email" id="regEmail" name="email" required data-track="focus" data-detail="register-email-focus">
-          <span class="error-msg">Please enter a valid email address.</span>
+          <input type="email" name="email" placeholder="Email" required />
         </div>
         <div class="form-group">
-          <label for="regPassword">Password <span style="color:var(--color-accent)">*</span></label>
-          <input type="password" id="regPassword" name="password" required minlength="4" data-track="focus" data-detail="register-password-focus">
-          <span class="error-msg">Please enter a password (min 4 characters).</span>
+          <input type="password" name="password" placeholder="Password" required minlength="6" />
         </div>
-        <button type="submit" class="btn btn-solid" style="width:100%;" data-track="submit" data-detail="register-form-submit">
-          <span class="btn-spinner"></span>
-          <span class="btn-text">Create Account</span>
+        <button type="submit" class="btn btn-accent btn-full submit-btn" id="register-submit">
+          <span class="btn-text">Register</span>
+          <span class="btn-spinner" aria-hidden="true"></span>
         </button>
       </form>
-
-      <div class="form-success" id="registerSuccess">
-        <h3>Welcome!</h3>
-        <p>Your account has been created successfully. Redirecting to the homepage...</p>
+      <div class="form-success" id="register-success" style="display:none;">
+        <h3>Registration Successful</h3>
+        <p>Welcome to Pendry Residences Mexico City.</p>
+        <a href="index.html" class="btn btn-accent">Continue to Homepage</a>
       </div>
     </div>
   </main>
 
-  <!-- Footer simplified -->
-  <footer class="site-footer" style="padding:2rem 0;">
-    <div class="container text-center">
-      <p style="font-size:.8rem; color:#555;">© 2026 Pendry Residences Mexico City. All rights reserved.</p>
+  <!-- Footer -->
+  <footer class="site-footer compact">
+    <div class="container footer-grid">
+      <div class="footer-col">
+        <p class="footer-copyright">© 2026 Pendry Residences Mexico City. All rights reserved.</p>
+      </div>
     </div>
   </footer>
 
-  <!-- Ghost Shopper Audit -->
-  <aside class="ghost-panel" id="ghostPanel">
-    <div class="ghost-header">
-      <span>Ghost Shopper Audit</span>
-      <button class="ghost-toggle" id="ghostToggle">−</button>
+  <!-- Ghost Shopper Audit Panel -->
+  <div class="audit-panel" id="audit-panel">
+    <div class="audit-header">
+      <h4>Ghost Shopper Audit</h4>
+      <button class="audit-toggle" id="audit-toggle" aria-label="Toggle audit panel">−</button>
     </div>
-    <ul class="ghost-log" id="ghostLog"></ul>
-  </aside>
+    <div class="audit-body" id="audit-body">
+      <ul class="audit-log" id="audit-log"></ul>
+    </div>
+  </div>
 
   <script src="script.js"></script>
 </body>

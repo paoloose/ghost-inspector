@@ -1,333 +1,417 @@
-/* ============================================================
-   Pendry Residences Mexico City – Static Clone JavaScript
-   ============================================================ */
-
 (function () {
   'use strict';
 
-  /* ── Utilities ── */
-  const $ = (sel, ctx = document) => ctx.querySelector(sel);
-  const $$ = (sel, ctx = document) => Array.from(ctx.querySelectorAll(sel));
-  const randDelay = () => Math.floor(Math.random() * 301) + 200; // 200–500 ms
+  /* ============================================
+     Utilities
+     ============================================ */
+  function $(sel) { return document.querySelector(sel); }
+  function $$(sel) { return Array.from(document.querySelectorAll(sel)); }
+  function randomDelay() { return Math.floor(Math.random() * 300) + 200; }
+  function now() { return new Date().toLocaleTimeString(); }
 
-  /* ── Ghost Shopper Audit ── */
-  const ghostPanel = $('#ghostPanel');
-  const ghostLog   = $('#ghostLog');
-  const ghostToggle = $('#ghostToggle');
-
-  function track(type, detail) {
-    if (!ghostLog) return;
-    const ts = new Date().toLocaleTimeString('en-US', { hour12: false });
-    const li = document.createElement('li');
-    li.innerHTML = `<span class="ts">${ts}</span> <strong>${type}</strong>: ${detail}`;
-    ghostLog.appendChild(li);
-    ghostLog.scrollTop = ghostLog.scrollHeight;
+  /* ============================================
+     Global Loader
+     ============================================ */
+  function showLoader(text) {
+    const loader = $('#global-loader');
+    if (!loader) return;
+    loader.querySelector('.loader-text').textContent = text || 'Loading...';
+    loader.classList.add('active');
+  }
+  function hideLoader() {
+    const loader = $('#global-loader');
+    if (loader) loader.classList.remove('active');
   }
 
-  if (ghostToggle) {
-    ghostToggle.addEventListener('click', () => {
-      const list = $('.ghost-log');
-      if (list.style.display === 'none') {
-        list.style.display = 'block';
-        ghostToggle.textContent = '−';
-      } else {
-        list.style.display = 'none';
-        ghostToggle.textContent = '+';
-      }
-      track('click', 'ghost-toggle');
+  /* ============================================
+     Audit Logger
+     ============================================ */
+  const auditLog = $('#audit-log');
+  function audit(action, detail) {
+    if (!auditLog) return;
+    const li = document.createElement('li');
+    li.innerHTML = '<span class="audit-ts">' + now() + '</span> ' + escapeHtml(action) + (detail ? ': ' + escapeHtml(detail) : '');
+    auditLog.appendChild(li);
+    auditLog.scrollTop = auditLog.scrollHeight;
+  }
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  /* ============================================
+     Audit Panel Toggle
+     ============================================ */
+  const auditToggle = $('#audit-toggle');
+  const auditBody = $('#audit-body');
+  if (auditToggle && auditBody) {
+    auditToggle.addEventListener('click', () => {
+      const collapsed = auditBody.classList.toggle('collapsed');
+      auditToggle.textContent = collapsed ? '+' : '−';
+      audit('AUDIT_PANEL_TOGGLE', collapsed ? 'collapsed' : 'expanded');
     });
   }
 
-  // Auto-track elements with data-track
-  document.addEventListener('click', (e) => {
-    const el = e.target.closest('[data-track]');
-    if (!el) return;
-    const type  = el.getAttribute('data-track');
-    const detail = el.getAttribute('data-detail') || el.textContent.trim().slice(0, 40);
-    track(type, detail);
-  });
-
-  /* ── Loading Overlay ── */
-  const loadingOverlay = $('#loadingOverlay');
-  const loadingText    = $('#loadingText');
-
-  function showLoading(text = 'Cargando...') {
-    if (!loadingOverlay) return;
-    if (loadingText) loadingText.textContent = text;
-    loadingOverlay.classList.add('visible');
-  }
-
-  function hideLoading() {
-    if (!loadingOverlay) return;
-    loadingOverlay.classList.remove('visible');
-  }
-
-  /* ── Button Loading State ── */
-  function setButtonLoading(btn, text) {
-    btn.classList.add('loading');
-    const txtSpan = btn.querySelector('.btn-text');
-    if (txtSpan) {
-      btn.dataset.originalText = txtSpan.textContent;
-      txtSpan.textContent = text;
+  /* ============================================
+     Hero Slider
+     ============================================ */
+  const heroSlides = $$('.hero-slide');
+  const heroDotsContainer = $('#hero-dots');
+  let heroIndex = 0;
+  if (heroSlides.length && heroDotsContainer) {
+    heroSlides.forEach((_, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'hero-dot' + (i === 0 ? ' active' : '');
+      btn.setAttribute('aria-label', 'Go to slide ' + (i + 1));
+      btn.addEventListener('click', () => {
+        setHeroSlide(i);
+        audit('HERO_SLIDE_CLICK', 'Slide ' + (i + 1));
+      });
+      heroDotsContainer.appendChild(btn);
+    });
+    function setHeroSlide(i) {
+      heroSlides.forEach((s, idx) => s.classList.toggle('active', idx === i));
+      const dots = $$('.hero-dot');
+      dots.forEach((d, idx) => d.classList.toggle('active', idx === i));
+      heroIndex = i;
     }
+    setInterval(() => {
+      heroIndex = (heroIndex + 1) % heroSlides.length;
+      setHeroSlide(heroIndex);
+    }, 5000);
   }
 
-  function resetButton(btn) {
-    btn.classList.remove('loading');
-    const txtSpan = btn.querySelector('.btn-text');
-    if (txtSpan && btn.dataset.originalText) {
-      txtSpan.textContent = btn.dataset.originalText;
-    }
+  /* ============================================
+     Image Sliders (Residences, Pendry Way, Culture)
+     ============================================ */
+  function initSimpleSlider(containerSelector) {
+    const container = $(containerSelector);
+    if (!container) return;
+    const slides = Array.from(container.children);
+    if (!slides.length) return;
+    let idx = 0;
+    setInterval(() => {
+      slides[idx].classList.remove('active');
+      idx = (idx + 1) % slides.length;
+      slides[idx].classList.add('active');
+    }, 4500);
   }
+  initSimpleSlider('#residences-slider');
+  initSimpleSlider('#pendryway-slider');
+  initSimpleSlider('#culture-slider');
 
-  /* ── Header Scroll Effect ── */
-  const header = $('#siteHeader');
-  function onScroll() {
-    if (!header) return;
-    if (window.scrollY > 50) header.classList.add('scrolled');
-    else header.classList.remove('scrolled');
-  }
-  window.addEventListener('scroll', onScroll, { passive: true });
-  onScroll();
-
-  /* ── Mobile Menu ── */
-  const hamburger = $('#hamburger');
-  const mobileNav = $('#mobileNav');
-  const mobileOverlay = $('#mobileOverlay');
-
-  function openMenu() {
-    if (mobileNav) mobileNav.classList.add('open');
-    if (mobileOverlay) mobileOverlay.classList.add('open');
+  /* ============================================
+     Mobile Menu
+     ============================================ */
+  const mobileToggle = $('#mobile-menu-toggle');
+  const mobileMenu = $('#mobile-menu');
+  const mobileClose = $('#mobile-menu-close');
+  function openMobileMenu() {
+    if (mobileMenu) mobileMenu.classList.add('open');
     document.body.style.overflow = 'hidden';
+    audit('MOBILE_MENU', 'opened');
   }
-
-  function closeMenu() {
-    if (mobileNav) mobileNav.classList.remove('open');
-    if (mobileOverlay) mobileOverlay.classList.remove('open');
+  function closeMobileMenu() {
+    if (mobileMenu) mobileMenu.classList.remove('open');
     document.body.style.overflow = '';
+    audit('MOBILE_MENU', 'closed');
+  }
+  if (mobileToggle) mobileToggle.addEventListener('click', openMobileMenu);
+  if (mobileClose) mobileClose.addEventListener('click', closeMobileMenu);
+  if (mobileMenu) {
+    mobileMenu.querySelectorAll('a').forEach(a => {
+      a.addEventListener('click', () => closeMobileMenu());
+    });
   }
 
-  if (hamburger) hamburger.addEventListener('click', () => {
-    if (mobileNav?.classList.contains('open')) closeMenu();
-    else openMenu();
+  /* ============================================
+     Smooth Scroll + Active Nav
+     ============================================ */
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+      const href = this.getAttribute('href');
+      if (!href || href === '#') return;
+      const target = document.querySelector(href);
+      if (target) {
+        e.preventDefault();
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        audit('NAV_CLICK', href);
+      }
+    });
   });
 
-  if (mobileOverlay) mobileOverlay.addEventListener('click', closeMenu);
-  $$('.mobile-link').forEach(link => link.addEventListener('click', () => {
-    setTimeout(closeMenu, 150);
-  }));
-
-  /* ── Smooth Scroll & Active Links ── */
   const sections = $$('section[id]');
-  const navLinks = $$('.main-nav a[href^="#"]');
-
-  function setActiveLink() {
+  const navLinks = $$('.main-nav a[href^="#"], .mobile-menu a[href^="#"]');
+  function highlightNav() {
     let current = '';
-    const scrollPos = window.scrollY + 120;
-    for (const sec of sections) {
-      if (scrollPos >= sec.offsetTop) current = sec.getAttribute('id');
-    }
+    const scrollY = window.scrollY + 100;
+    sections.forEach(sec => {
+      if (scrollY >= sec.offsetTop) current = sec.getAttribute('id');
+    });
     navLinks.forEach(link => {
       link.classList.toggle('active', link.getAttribute('href') === '#' + current);
     });
   }
-  window.addEventListener('scroll', setActiveLink, { passive: true });
+  window.addEventListener('scroll', highlightNav);
+  highlightNav();
 
-  document.addEventListener('click', (e) => {
-    const anchor = e.target.closest('a[href^="#"]');
-    if (!anchor) return;
-    const id = anchor.getAttribute('href').slice(1);
-    const target = document.getElementById(id);
-    if (target) {
-      e.preventDefault();
-      const y = target.getBoundingClientRect().top + window.scrollY - 80;
-      window.scrollTo({ top: y, behavior: 'smooth' });
-    }
-  });
-
-  /* ── Hero Slider ── */
-  const slides = $$('.hero-slide');
-  let slideIdx = 0;
-  if (slides.length > 1) {
-    setInterval(() => {
-      slides[slideIdx].classList.remove('active');
-      slideIdx = (slideIdx + 1) % slides.length;
-      slides[slideIdx].classList.add('active');
-    }, 5000);
+  /* ============================================
+     Header Scroll Effect
+     ============================================ */
+  const header = $('#header');
+  if (header) {
+    window.addEventListener('scroll', () => {
+      header.classList.toggle('scrolled', window.scrollY > 40);
+    });
   }
 
-  /* ── Touch detection for cards ── */
-  if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
-    document.body.classList.add('touch-device');
-    $$('.img-card').forEach(card => card.classList.add('touch-visible'));
-  }
-
-  /* ── Generic Form Handler ── */
-  function handleForm(formId, successId, submitText, successCallback) {
-    const form = $(formId);
-    const successBox = $(successId);
-    if (!form) return;
-
-    form.addEventListener('submit', (e) => {
+  /* ============================================
+     Form Handling — Inquiry
+     ============================================ */
+  const inquiryForm = $('#inquiry-form');
+  const inquirySubmit = $('#inquiry-submit');
+  const inquirySuccess = $('#inquiry-success');
+  if (inquiryForm) {
+    inquiryForm.addEventListener('submit', function (e) {
       e.preventDefault();
       let valid = true;
-
-      // Reset errors
-      form.querySelectorAll('.form-group').forEach(g => g.classList.remove('invalid'));
-
-      // Validate required fields
-      form.querySelectorAll('input, textarea, select').forEach(field => {
-        if (field.required && !field.value.trim()) {
+      const data = {};
+      inquiryForm.querySelectorAll('input[required]').forEach(inp => {
+        data[inp.name] = inp.value.trim();
+        if (!inp.value.trim()) {
           valid = false;
-          field.closest('.form-group')?.classList.add('invalid');
-        }
-        if (field.type === 'email' && field.value.trim()) {
-          const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-          if (!re.test(field.value.trim())) {
-            valid = false;
-            field.closest('.form-group')?.classList.add('invalid');
-          }
-        }
-        if (field.type === 'password' && field.hasAttribute('minlength')) {
-          const min = parseInt(field.getAttribute('minlength'), 10);
-          if (field.value.length < min) {
-            valid = false;
-            field.closest('.form-group')?.classList.add('invalid');
-          }
+          inp.style.borderColor = '#e74c3c';
+        } else if (inp.type === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(inp.value.trim())) {
+          valid = false;
+          inp.style.borderColor = '#e74c3c';
+        } else {
+          inp.style.borderColor = '#ddd';
         }
       });
-
       if (!valid) {
-        track('form-validation', 'failed ' + formId);
+        audit('INQUIRY_FORM', 'validation_failed');
         return;
       }
-
-      const btn = form.querySelector('button[type="submit"]');
-      if (btn) setButtonLoading(btn, submitText);
-
-      const delay = randDelay();
-      showLoading(submitText + '...');
-
+      inquirySubmit.classList.add('loading');
+      inquirySubmit.disabled = true;
+      audit('INQUIRY_FORM', 'submit_started');
       setTimeout(() => {
-        hideLoading();
-        if (btn) resetButton(btn);
-        form.style.display = 'none';
-        if (successBox) successBox.classList.add('visible');
-        track('form-submit', 'success ' + formId);
-        if (typeof successCallback === 'function') successCallback(form);
-      }, delay);
+        inquirySubmit.classList.remove('loading');
+        inquirySubmit.disabled = false;
+        inquiryForm.style.display = 'none';
+        inquirySuccess.style.display = 'block';
+        audit('INQUIRY_FORM', 'submit_success');
+      }, randomDelay());
+    });
+    inquiryForm.querySelectorAll('input').forEach(inp => {
+      inp.addEventListener('input', () => { inp.style.borderColor = '#ddd'; });
     });
   }
 
-  /* ── Inquiry Form ── */
-  handleForm('#inquiryForm', '#formSuccess', 'Enviando');
-
-  /* ── Register Form ── */
-  handleForm('#registerForm', '#registerSuccess', 'Creando cuenta...', (form) => {
-    const email = form.querySelector('#regEmail')?.value.trim() || 'user@example.com';
-    const name  = form.querySelector('#regName')?.value.trim() || 'user';
-    const session = {
-      email: email,
-      name: name,
-      registeredAt: '2026-01-01T00:00:00.000Z'
-    };
-    localStorage.setItem('rvbr_session', JSON.stringify(session));
-    track('auth', 'registered ' + email);
-
-    setTimeout(() => {
-      showLoading('Redirigiendo...');
+  /* ============================================
+     Form Handling — Register
+     ============================================ */
+  const registerForm = $('#register-form');
+  const registerSubmit = $('#register-submit');
+  const registerSuccess = $('#register-success');
+  if (registerForm) {
+    registerForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      let valid = true;
+      const name = registerForm.querySelector('input[name="name"]');
+      const email = registerForm.querySelector('input[name="email"]');
+      const password = registerForm.querySelector('input[name="password"]');
+      [name, email, password].forEach(inp => {
+        if (!inp.value.trim()) {
+          valid = false;
+          inp.style.borderColor = '#e74c3c';
+        } else if (inp.type === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(inp.value.trim())) {
+          valid = false;
+          inp.style.borderColor = '#e74c3c';
+        } else if (inp.type === 'password' && inp.value.trim().length < 6) {
+          valid = false;
+          inp.style.borderColor = '#e74c3c';
+        } else {
+          inp.style.borderColor = '#ddd';
+        }
+      });
+      if (!valid) {
+        audit('REGISTER_FORM', 'validation_failed');
+        return;
+      }
+      registerSubmit.classList.add('loading');
+      registerSubmit.disabled = true;
+      audit('REGISTER_FORM', 'submit_started');
       setTimeout(() => {
-        window.location.href = 'index.html';
-      }, 400);
-    }, 1200);
-  });
+        const session = {
+          email: email.value.trim(),
+          name: name.value.trim().split(' ')[0] || 'user',
+          registeredAt: new Date().toISOString()
+        };
+        localStorage.setItem('rvbr_session', JSON.stringify(session));
+        registerSubmit.classList.remove('loading');
+        registerSubmit.disabled = false;
+        registerForm.style.display = 'none';
+        registerSuccess.style.display = 'block';
+        audit('REGISTER_FORM', 'submit_success — session created');
+        setTimeout(() => { window.location.href = 'index.html'; }, 1200);
+      }, randomDelay());
+    });
+    registerForm.querySelectorAll('input').forEach(inp => {
+      inp.addEventListener('input', () => { inp.style.borderColor = '#ddd'; });
+    });
+  }
 
-  /* ── Session Management ── */
-  const sessionRaw = localStorage.getItem('rvbr_session');
-  const userIndicator = $('#userIndicator');
-  const userNameSpan = $('#userName');
-  const registerLinks = $$('.register-link');
-
-  if (sessionRaw) {
+  /* ============================================
+     Auth Session
+     ============================================ */
+  function getSession() {
     try {
-      const session = JSON.parse(sessionRaw);
-      registerLinks.forEach(el => el.style.display = 'none');
-      if (userIndicator) userIndicator.style.display = 'flex';
-      if (userNameSpan) userNameSpan.textContent = session.name || 'user';
-      track('session', 'restored ' + session.email);
-    } catch (e) {
-      localStorage.removeItem('rvbr_session');
+      const raw = localStorage.getItem('rvbr_session');
+      return raw ? JSON.parse(raw) : null;
+    } catch (_) { return null; }
+  }
+  function updateAuthUI() {
+    const session = getSession();
+    const registerLink = $('#register-link');
+    const userIndicator = $('#user-indicator');
+    const userName = $('#user-name');
+    const mobileRegisterItem = $('#mobile-register-item');
+    const mobileLogoutItem = $('#mobile-logout-item');
+    if (session) {
+      if (registerLink) registerLink.style.display = 'none';
+      if (userIndicator) { userIndicator.style.display = 'flex'; userName.textContent = session.name; }
+      if (mobileRegisterItem) mobileRegisterItem.style.display = 'none';
+      if (mobileLogoutItem) mobileLogoutItem.style.display = 'block';
+    } else {
+      if (registerLink) registerLink.style.display = 'inline-flex';
+      if (userIndicator) userIndicator.style.display = 'none';
+      if (mobileRegisterItem) mobileRegisterItem.style.display = 'block';
+      if (mobileLogoutItem) mobileLogoutItem.style.display = 'none';
     }
   }
+  updateAuthUI();
 
-  const logoutBtn = $('#logoutBtn');
-  if (logoutBtn) {
-    logoutBtn.addEventListener('click', () => {
-      showLoading('Cerrando sesión...');
-      track('auth', 'logout');
+  function doLogout() {
+    showLoader('Cerrando sesión...');
+    audit('LOGOUT', 'initiated');
+    setTimeout(() => {
+      localStorage.removeItem('rvbr_session');
+      hideLoader();
+      audit('LOGOUT', 'completed');
+      window.location.reload();
+    }, randomDelay());
+  }
+  $('#logout-btn')?.addEventListener('click', doLogout);
+  $('#mobile-logout-btn')?.addEventListener('click', doLogout);
+
+  /* ============================================
+     Loading States for External / Contact Actions
+     ============================================ */
+  // WhatsApp
+  const waBtn = $('#whatsapp-float');
+  if (waBtn) {
+    waBtn.addEventListener('click', function (e) {
+      e.preventDefault();
+      showLoader('Abriendo WhatsApp...');
+      audit('WHATSAPP_CLICK', 'https://wa.me/525529196649');
       setTimeout(() => {
-        localStorage.removeItem('rvbr_session');
-        window.location.reload();
-      }, randDelay());
+        hideLoader();
+        window.open('https://wa.me/525529196649', '_blank', 'noopener');
+      }, randomDelay());
     });
   }
 
-  /* ── Intercept contact links ── */
-  function interceptContactLinks() {
-    document.addEventListener('click', (e) => {
-      const el = e.target.closest('a');
-      if (!el) return;
-
-      const href = el.getAttribute('href') || '';
-      let text = null;
-      let delay = 300;
-
-      if (href.startsWith('https://wa.me/')) {
-        e.preventDefault();
-        text = 'Abriendo WhatsApp...';
-      } else if (href.startsWith('mailto:')) {
-        e.preventDefault();
-        text = 'Abriendo correo...';
-      } else if (href.startsWith('tel:')) {
-        e.preventDefault();
-        text = 'Iniciando llamada...';
-      } else if (el.classList.contains('external-link') || el.classList.contains('btn-cta')) {
-        // Brief flash for external / CTA buttons that aren't anchors
-        if (href === '#' || !href.startsWith('#')) {
-          text = 'Cargando...';
-          delay = randDelay();
-        }
-      }
-
-      if (text) {
-        showLoading(text);
-        setTimeout(() => {
-          hideLoading();
-          if (href && href !== '#') window.open(href, el.target || '_self');
-        }, delay);
-      }
-    });
-  }
-  interceptContactLinks();
-
-  /* ── Image Error Fallback ── */
-  $$('img').forEach(img => {
-    img.addEventListener('error', () => {
-      const card = img.closest('.img-card, .media');
-      if (card) {
-        card.classList.add('img-fallback');
-        if (!card.getAttribute('data-label')) {
-          card.setAttribute('data-label', img.alt || 'Image');
-        }
-      }
-      img.style.display = 'none';
+  // Email links
+  document.querySelectorAll('a[href^="mailto:"]').forEach(link => {
+    link.addEventListener('click', function (e) {
+      e.preventDefault();
+      const addr = this.getAttribute('href').replace('mailto:', '');
+      showLoader('Abriendo correo...');
+      audit('EMAIL_CLICK', addr);
+      setTimeout(() => {
+        hideLoader();
+        window.location.href = this.getAttribute('href');
+      }, randomDelay());
     });
   });
 
-  /* ── Ensure no console.error on load ── */
-  window.addEventListener('error', (e) => {
-    // Log to ghost shopper but suppress console noise
-    track('js-error', e.message);
+  // Phone links
+  document.querySelectorAll('a[href^="tel:"]').forEach(link => {
+    link.addEventListener('click', function (e) {
+      e.preventDefault();
+      const num = this.getAttribute('href').replace('tel:', '');
+      showLoader('Iniciando llamada...');
+      audit('PHONE_CLICK', num);
+      setTimeout(() => {
+        hideLoader();
+        window.location.href = this.getAttribute('href');
+      }, randomDelay());
+    });
+  });
+
+  // External links on cards / offerings
+  document.querySelectorAll('a[target="_blank"]').forEach(link => {
+    if (link.classList.contains('whatsapp-float')) return;
+    const href = link.getAttribute('href');
+    if (href && href.startsWith('http')) {
+      link.addEventListener('click', function (e) {
+        if (this.closest('.inquiry-form') || this.closest('.register-form')) return;
+        e.preventDefault();
+        showLoader('Abriendo enlace...');
+        audit('EXTERNAL_LINK_CLICK', href);
+        setTimeout(() => {
+          hideLoader();
+          window.open(href, '_blank', 'noopener');
+        }, randomDelay());
+      });
+    }
+  });
+
+  // CTA buttons with simulated async
+  document.querySelectorAll('.cta-btn, .hero-cta').forEach(btn => {
+    const href = btn.getAttribute('href');
+    if (href && href.startsWith('#')) {
+      btn.addEventListener('click', function (e) {
+        audit('CTA_CLICK', href);
+      });
+    } else if (!href || href === '') {
+      btn.addEventListener('click', function (e) {
+        e.preventDefault();
+        const text = this.textContent.trim();
+        showLoader('Processing...');
+        audit('CTA_CLICK', text);
+        setTimeout(() => {
+          hideLoader();
+        }, randomDelay());
+      });
+    }
+  });
+
+  /* ============================================
+     Image Error Handling
+     ============================================ */
+  document.querySelectorAll('img').forEach(img => {
+    if (!img.hasAttribute('onerror')) {
+      img.addEventListener('error', function () {
+        this.style.display = 'none';
+        const parent = this.parentElement;
+        if (parent) parent.classList.add('img-fallback');
+      });
+    }
+  });
+
+  /* ============================================
+     Footer Policy Links (no-op with loading)
+     ============================================ */
+  document.querySelectorAll('.footer-col a[href="#"], .form-disclaimer a[href="#"]').forEach(link => {
+    link.addEventListener('click', function (e) {
+      e.preventDefault();
+      showLoader('Loading...');
+      audit('POLICY_LINK_CLICK', this.textContent.trim());
+      setTimeout(() => { hideLoader(); }, randomDelay());
+    });
   });
 
 })();
