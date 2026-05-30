@@ -24,13 +24,13 @@ First, determine a short slug for the business from the URL (e.g., `ramirezvazqu
 
 ## 2. Update Contact Information
 - **Find and replace ALL phone numbers and WhatsApp references** across every file with:
-  - **Phone:** `+525537215924`
-  - **WhatsApp link format:** `https://wa.me/525537215924`
-- Update visible text (e.g., "Tel: +525537215924").
+  - **Phone:** `+525543716148`
+  - **WhatsApp link format:** `https://wa.me/525543716148`
+- Update visible text (e.g., "Tel: +525543716148").
 - If the original site **does not have a WhatsApp floating button**, add one:
   - Fixed position, bottom-right.
   - WhatsApp logo image.
-  - Link to `https://wa.me/525537215924`.
+  - Link to `https://wa.me/525543716148`.
   - Track clicks on it.
 
 ## 3. Remove Irrelevant/Unwanted Channels
@@ -105,8 +105,8 @@ Create a file `demos/<business-slug>/README.md` containing **all** site-specific
 - **Full business description / tagline / mission statement** (copy all text verbatim if possible).
 - **Contact info:**
   - Email addresses found.
-  - Phone number used in the clone (`+525537215924`) and note that it replaced the original.
-  - WhatsApp link (`https://wa.me/525537215924`).
+  - Phone number used in the clone (`+525543716148`) and note that it replaced the original.
+  - WhatsApp link (`https://wa.me/525543716148`).
   - Physical address if listed.
 - **People:** Any names of founders, agents, team members, or authors mentioned.
 - **Services / Products:** Full list with descriptions.

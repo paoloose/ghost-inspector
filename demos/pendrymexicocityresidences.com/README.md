@@ -47,11 +47,11 @@ Our mocked version is <https://pendrymexicocityresidences.paoloose.site/>. Use i
 ## Contact Information
 
 ### Phone Number Used in Clone
-- **+525537215924**
+- **+525543716148**
 - *Note: This replaced the original number `+1 (424) 453-8669`.*
 
 ### WhatsApp
-- **Link:** `https://wa.me/525537215924`
+- **Link:** `https://wa.me/525543716148`
 - Added as a fixed floating button on all pages (bottom-right) because the original site did **not** have a WhatsApp button.
 
 ### Email
@@ -389,7 +389,7 @@ The delay is randomized between **200ms and 500ms**.
 6. **Gravity Forms omitted** — The original uses Gravity Forms with complex theme logic. The clone uses simple HTML5 forms with custom validation.
 7. **No popup overlays** — The original has Divi popups for ownership inquiries. The clone consolidates everything into a single inquiry section.
 8. **WhatsApp button added** — The original site had no WhatsApp button. A floating WhatsApp button was added as requested.
-9. **Phone number updated** — Original `+1 (424) 453-8669` replaced with `+525537215924` everywhere (footer, tel: links, visible text).
+9. **Phone number updated** — Original `+1 (424) 453-8669` replaced with `+525543716148` everywhere (footer, tel: links, visible text).
 10. **Irrelevant channels removed** — No Telegram, Skype, Facebook Messenger, or other chat widgets are present. Only email, phone, and WhatsApp are kept.
 11. **Privacy Policy / Terms links** — These are non-functional (`href="#"`) because the clone does not replicate the policy pages; they show a brief loading state when clicked.
 12. **Logo fallback** — If the hotlinked logo fails to load, a text fallback "PENDRY MEXICO" is rendered.
