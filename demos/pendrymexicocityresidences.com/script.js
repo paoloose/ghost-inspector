@@ -315,10 +315,10 @@
     waBtn.addEventListener('click', function (e) {
       e.preventDefault();
       showLoader('Abriendo WhatsApp...');
-      audit('WHATSAPP_CLICK', 'https://wa.me/525529196649');
+      audit('WHATSAPP_CLICK', 'https://wa.me/525537215924');
       setTimeout(() => {
         hideLoader();
-        window.open('https://wa.me/525529196649', '_blank', 'noopener');
+        window.open('https://wa.me/525537215924', '_blank', 'noopener');
       }, randomDelay());
     });
   }
